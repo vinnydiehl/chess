@@ -15,9 +15,11 @@ class ChessGame
     @sounds = args.outputs.sounds
     @primitives = args.outputs.primitives
     @static_primitives = args.outputs.static_primitives
+    @sprites = args.outputs.sprites
 
     @scene_stack = []
     @scene = :game
+    game_init
   end
 
   def tick
@@ -26,5 +28,10 @@ class ChessGame
     scene = @scene
     send "#{scene}_tick"
     send "render_#{scene}"
+
+    # Reset game, for development
+    if @inputs.keyboard.key_down.backspace
+      @args.gtk.reset
+    end
   end
 end
