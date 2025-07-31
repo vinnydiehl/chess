@@ -10,11 +10,7 @@ class ChessGame
     @piece_held = nil
     @piece_original_pos = nil
 
-    # Debug
-    @board[0][0] = Piece.new(:black, :rook)
-    @board[2][2] = Piece.new(:black, :queen)
-    @board[4][3] = Piece.new(:white, :king)
-    @board[7][2] = Piece.new(:white, :bishop)
+    set_fen(FEN)
   end
 
   def game_tick
