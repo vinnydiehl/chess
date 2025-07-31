@@ -38,6 +38,11 @@ class ChessGame
   end
 
   def render_square_highlights
+    render_hover_highlight
+    render_legal_highlights
+  end
+
+  def render_hover_highlight
     # Highlight square under cursor, unless a piece is picked up, then leave
     # the highlight on the piece's original position
     if mouse_on_board? || @piece_held
@@ -53,6 +58,22 @@ class ChessGame
         w: @square_size, h: @square_size,
         **HOVER_HIGHLIGHT_COLOR
       }
+    end
+  end
+
+  def render_legal_highlights
+    if @piece_held
+      moves = legal_moves(@piece_held, *@piece_original_pos)
+      return unless moves
+      moves.each do |move|
+        x, y = move
+        @primitives << {
+          primitive_marker: :solid,
+          x: @x_offset + x * @square_size, y: y * @square_size,
+          w: @square_size, h: @square_size,
+          **LEGAL_MOVE_HIGHLIGHT_COLOR
+        }
+      end
     end
   end
 

@@ -4,7 +4,6 @@ class ChessGame
     @board_size = @screen_height # for now
     @square_size = @board_size / 8
 
-    @board = @state.board
     @board = Array.new(8) { Array.new(8, nil) }
 
     @piece_held = nil
