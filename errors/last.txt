@@ -1,0 +1,11 @@
+* EXCEPTION:
+* ERROR:
+{:x=>0, :y=>0, :w=>nil, :h=>nil, :r=>255, :g=>0, :b=>0}
+
+I don't know how to use the above Hash with SDL's FFI. Please
+add a method on the object called ~primitive_marker~ that
+returns :solid, :sprite, :label, :line, or :border. If the object
+is a Hash, please add { primitive_marker: :PRIMITIVE_SYMBOL } to the Hash.
+
+
+** Backtrace:
