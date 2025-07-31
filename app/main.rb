@@ -1,6 +1,6 @@
 SCENES = %w[game].freeze
 
-%w[chess piece].each { |f| require "app/chess/#{f}.rb" }
+%w[chess colors input piece].each { |f| require "app/chess/#{f}.rb" }
 
 %w[scenes render].each { |dir| SCENES.each { |f| require "app/chess/#{dir}/#{f}.rb" } }
 

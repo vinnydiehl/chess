@@ -9,6 +9,7 @@ class ChessGame
     @screen_height = args.grid.h
 
     @inputs = args.inputs
+    @mouse = args.inputs.mouse
 
     # Outputs
     @debug = args.outputs.debug
