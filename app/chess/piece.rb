@@ -57,12 +57,18 @@ class ChessGame
       # Check captures
       if x > 0
         x -= 1
-        moves += [[x, y]] if @board[x][y] && @board[x][y].color != piece.color
+        if @board[x][y] && @board[x][y].color != piece.color ||
+           [x, y] == @en_passant_target
+          moves += [[x, y]]
+        end
       end
       x = sx
       if x < 7
         x += 1
-        moves += [[x, y]] if @board[x][y] && @board[x][y].color != piece.color
+        if @board[x][y] && @board[x][y].color != piece.color ||
+           [x, y] == @en_passant_target
+          moves += [[x, y]]
+        end
       end
       x = sx
 
@@ -81,12 +87,18 @@ class ChessGame
       # Check captures
       if x > 0
         x -= 1
-        moves += [[x, y]] if @board[x][y] && @board[x][y].color != piece.color
+        if @board[x][y] && @board[x][y].color != piece.color ||
+           [x, y] == @en_passant_target
+          moves += [[x, y]]
+        end
       end
       x = sx
       if x < 7
         x += 1
-        moves += [[x, y]] if @board[x][y] && @board[x][y].color != piece.color
+        if @board[x][y] && @board[x][y].color != piece.color ||
+           [x, y] == @en_passant_target
+          moves += [[x, y]]
+        end
       end
       x = sx
 

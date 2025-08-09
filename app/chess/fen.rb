@@ -1,6 +1,6 @@
 # Hardcoded starting position for now
 # FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-FEN = "8/1Q2K1p1/3B1n1p/1k6/8/1R3P2/3bP3/1N5q w - - 0 1"
+FEN = "8/1Q2K3/p2B1n2/1k4Pp/8/1R3P2/3bP3/1N5q w - h6 0 1"
 
 KEY = {
   "p" => :pawn,
@@ -37,5 +37,8 @@ class ChessGame
       y += 1
       x = 0
     end
+
+    # Set en passant target square
+    @en_passant_target = fen[3] == "-" ? nil : notation_to_square(fen[3])
   end
 end
