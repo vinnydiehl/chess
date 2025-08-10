@@ -50,8 +50,8 @@ class ChessGame
           instance_variable_set("@#{color_affected}_can_castle_#{side_affected}", false)
         end
 
-        # En passant
         if piece_moved.type == :pawn
+          # En passant
           ep_y = piece_moved.color == :white ? y - 1 : y + 1
 
           # Set en passant target
@@ -67,6 +67,14 @@ class ChessGame
           end
         else
           @en_passant_target = nil
+        end
+
+        # Pawn promotion
+        # For now, this just makes it into a queen.
+        # TODO: allow promotion choice.
+        if (piece_moved.color == :white && y == 7) ||
+           (piece_moved.color == :black && y == 0)
+          @board[x][y] = Piece.new(piece_moved.color, :queen)
         end
       else
         @board[@piece_original_pos.x][@piece_original_pos.y] = @piece_held
