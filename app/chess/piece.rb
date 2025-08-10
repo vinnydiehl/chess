@@ -49,7 +49,7 @@ class ChessGame
       if send("#{piece.color}_can_castle_queenside?") &&
          (1..3).all? { |n| sx - n >= 0 && @board[sx -n][sy].nil? } &&
          (sx - 2..sx).none? { |x| opponent_vision.include?([x, sy]) }
-        moves << [sx - 3, sy]
+        moves << [sx - 2, sy]
       end
     end
 
