@@ -227,7 +227,19 @@ class ChessGame
       [0, 1],
     ]
 
-    offset_legal_moves(offsets, piece, sx, sy)
+    moves = offset_legal_moves(offsets, piece, sx, sy)
+
+    if send("#{piece.color}_can_castle_kingside?") &&
+       (1..2).all? { |n| sx + n <= 7 && @board[sx + n][sy].nil? }
+      moves += [[sx + 2, sy]]
+    end
+
+    if send("#{piece.color}_can_castle_queenside?") &&
+       (1..3).all? { |n| sx - n >= 0 && @board[sx -n][sy].nil? }
+      moves += [[sx - 3, sy]]
+    end
+
+    moves
   end
 
   def knight_legal_moves(piece, sx, sy)
