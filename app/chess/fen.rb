@@ -38,9 +38,14 @@ class ChessGame
       x = 0
     end
 
+    # Whose turn is it?
+    @color_to_move = { "w" => :white, "b": :black }[fen[1]]
+
     set_castling_availability(fen[2])
 
     # Set en passant target square
     @en_passant_target = fen[3] == "-" ? nil : notation_to_square(fen[3])
+
+    @move_count = fen[5].to_i
   end
 end

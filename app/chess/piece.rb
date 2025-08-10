@@ -27,6 +27,9 @@ class ChessGame
   # Returns an array of squares that the piece on [sx, sy] can legally move to,
   # or nil if there are no legal moves.
   def legal_moves(piece, sx, sy)
+    # If it's not your turn, fuck you
+    return if piece.color != @color_to_move
+
     moves = piece_vision(piece, sx, sy).reject do |x, y|
       # Simulate all possible moves for the piece and reject moves that would
       # put the player in check

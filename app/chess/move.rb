@@ -15,13 +15,22 @@ class ChessGame
       if mouse_on_board?
         x, y = mouse_board_pos
 
+        # Reject move if releasing in the sqaure of origin,
+        # or the move is illegal
+        if [@x_orig, @y_orig] == [x, y] ||
+           !legal_moves(@piece_held, @x_orig, @y_orig)&.include?([x, y])
+          @board[@x_orig][@y_orig] = @piece_held
+          @piece_held = nil
+          return
+        end
+
+        # Switch turns if that worked
+        @color_to_move = OTHER_COLOR[@piece_held.color]
+
+        # Resolve move
         @board[x][y] = @piece_held
         @piece_held = nil
         @piece_original_pos = nil
-
-        # If releasing in the square of origin, nothing to see here
-        return if [@x_orig, @y_orig] == [x, y]
-
         piece_moved = @board[x][y]
 
         # Castling
@@ -76,6 +85,9 @@ class ChessGame
            (piece_moved.color == :black && y == 0)
           @board[x][y] = Piece.new(piece_moved.color, :queen)
         end
+
+        # Increment move counter
+        @move_count += 1 if piece_moved.color == :black
       else
         @board[@piece_original_pos.x][@piece_original_pos.y] = @piece_held
         @piece_held = nil
