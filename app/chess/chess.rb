@@ -10,6 +10,7 @@ class ChessGame
 
     @inputs = args.inputs
     @mouse = args.inputs.mouse
+    @kb = args.inputs.keyboard
 
     # Outputs
     @debug = args.outputs.debug

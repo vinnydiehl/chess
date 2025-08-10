@@ -17,4 +17,16 @@ class ChessGame
   def game_tick
     resolve_move_input
   end
+
+  def board_deep_copy
+    temp = []
+
+    @board.each do |file|
+      tf = []
+      file.each { |piece| tf << piece }
+      temp << tf
+    end
+
+    temp
+  end
 end
