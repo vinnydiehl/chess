@@ -82,7 +82,7 @@ class ChessGame
   def render_vision_highlights
     { w: :white, b: :black }.each do |key, color|
       if @kb.key_down_or_held?(key)
-        vision = vision_squares(color)
+        vision = color_vision(color)
         return unless vision
         vision.each do |square|
           x, y = square
