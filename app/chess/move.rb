@@ -74,16 +74,16 @@ class ChessGame
 
             @en_passant_target = nil
           end
+
+          # Pawn promotion
+          # For now, this just makes it into a queen.
+          # TODO: allow promotion choice.
+          if (piece_moved.color == :white && y == 7) ||
+             (piece_moved.color == :black && y == 0)
+            @board[x][y] = Piece.new(piece_moved.color, :queen)
+          end
         else
           @en_passant_target = nil
-        end
-
-        # Pawn promotion
-        # For now, this just makes it into a queen.
-        # TODO: allow promotion choice.
-        if (piece_moved.color == :white && y == 7) ||
-           (piece_moved.color == :black && y == 0)
-          @board[x][y] = Piece.new(piece_moved.color, :queen)
         end
 
         # Increment move counter
