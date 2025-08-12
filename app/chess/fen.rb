@@ -1,5 +1,6 @@
 # Hardcoded starting position for now
 FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+# FEN = "K/8/8/8/8/8/8/kq w KQkq - 0 1"
 # FEN = "8/1Q2K3/p2B1n2/1k4Pp/8/1R3P2/3bP3/1N5q w - h6 0 1"
 
 KEY = {

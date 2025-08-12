@@ -93,6 +93,14 @@ class ChessGame
         @piece_held = nil
         @piece_original_pos = nil
       end
+
+      if checkmate?(@color_to_move)
+        puts "#{@color_to_move.to_s.capitalize} is checkmated."
+      end
+
+      if stalemate?(@color_to_move)
+        puts "Stalemate."
+      end
     end
   end
 end
