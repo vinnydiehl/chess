@@ -5,6 +5,7 @@ class ChessGame
     @square_size = @board_size / 8
 
     @board = Array.new(8) { Array.new(8, nil) }
+    @notation = ""
 
     @piece_held = nil
     @piece_original_pos = nil

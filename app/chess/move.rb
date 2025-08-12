@@ -24,13 +24,12 @@ class ChessGame
           return
         end
 
-        # Switch turns if that worked
-        @color_to_move = OTHER_COLOR[@piece_held.color]
+        # Is this a capture?
+        capture = !@board[x][y].nil?
 
         # Resolve move
         @board[x][y] = @piece_held
         @piece_held = nil
-        @piece_original_pos = nil
         piece_moved = @board[x][y]
 
         # Castling
@@ -59,6 +58,7 @@ class ChessGame
           instance_variable_set("@#{color_affected}_can_castle_#{side_affected}", false)
         end
 
+        promoted = false
         if piece_moved.type == :pawn
           # En passant
           ep_y = piece_moved.color == :white ? y - 1 : y + 1
@@ -80,26 +80,27 @@ class ChessGame
           # TODO: allow promotion choice.
           if (piece_moved.color == :white && y == 7) ||
              (piece_moved.color == :black && y == 0)
+            promoted = true
             @board[x][y] = Piece.new(piece_moved.color, :queen)
           end
         else
           @en_passant_target = nil
         end
 
+        # Switch turns
+        @color_to_move = OTHER_COLOR[@color_to_move]
+
+        update_notation(piece_moved, @piece_original_pos, x, y, capture, promoted)
+        puts "\n#{@notation}"
+
         # Increment move counter
         @move_count += 1 if piece_moved.color == :black
+
+        @piece_original_pos = nil
       else
         @board[@piece_original_pos.x][@piece_original_pos.y] = @piece_held
         @piece_held = nil
         @piece_original_pos = nil
-      end
-
-      if checkmate?(@color_to_move)
-        puts "#{@color_to_move.to_s.capitalize} is checkmated."
-      end
-
-      if stalemate?(@color_to_move)
-        puts "Stalemate."
       end
     end
   end
