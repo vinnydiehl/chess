@@ -12,6 +12,8 @@ class ChessGame
 
         @notation += PIECE_NOTATION[promotion_type]
         print_notation
+
+        play_sound(:promotion)
       end
 
       # Otherwise, see if we're picking up a piece
@@ -31,14 +33,20 @@ class ChessGame
         # Reject move if releasing in the sqaure of origin,
         # or the move is illegal
         if [@x_orig, @y_orig] == [x, y] ||
-           !legal_moves(@piece_held, @x_orig, @y_orig)&.include?([x, y])
+           (illegal = !legal_moves(@piece_held, @x_orig, @y_orig)&.include?([x, y]))
           @board[@x_orig][@y_orig] = @piece_held
           @piece_held = nil
+          play_sound(:illegal) if illegal
           return
         end
 
+        # There are multiple sounds that may be played. If this doesn't
+        # get set, the normal sound will be played later
+        sound = nil
+
         # Is this a capture?
         capture = !@board[x][y].nil?
+        sound = :capture if capture
 
         # Resolve move
         @board[x][y] = @piece_held
@@ -57,6 +65,8 @@ class ChessGame
               @board[0][y] = nil
               @board[x + 1][y] = Piece.new(piece_moved.color, :rook)
             end
+
+            sound = :castle
           end
 
           # Moving the king means no more castling for that color
@@ -106,6 +116,14 @@ class ChessGame
         @move_count += 1 if piece_moved.color == :black
 
         @piece_original_pos = nil
+
+        if checkmate?(@color_to_move) || stalemate?(@color_to_move)
+          sound = :game_end
+        elsif in_check?(@color_to_move)
+          sound = :move_check
+        end
+
+        play_sound(sound || :move_self)
       else
         @board[@piece_original_pos.x][@piece_original_pos.y] = @piece_held
         @piece_held = nil

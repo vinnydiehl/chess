@@ -25,6 +25,8 @@ class ChessGame
     @promotion = nil
 
     set_fen(FEN)
+
+    play_sound(:game_start)
   end
 
   def game_tick
