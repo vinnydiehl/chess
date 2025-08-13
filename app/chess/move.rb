@@ -20,9 +20,18 @@ class ChessGame
       # Otherwise, see if we're picking up a piece
 
       @x_orig, @y_orig = mouse_board_pos
+      piece = @board[@x_orig][@y_orig]
 
-      return if (@board[@x_orig][@y_orig].nil?)
-      @piece_held = @board[@x_orig][@y_orig]
+      return unless piece
+
+      # Don't even let the piece be picked up if it's not
+      # that color's turn
+      if piece.color != @color_to_move
+        play_sound(:illegal)
+        return
+      end
+
+      @piece_held = piece
       @piece_original_pos = [@x_orig, @y_orig]
       @board[@x_orig][@y_orig] = nil
     end
