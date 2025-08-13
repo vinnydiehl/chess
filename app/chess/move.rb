@@ -125,9 +125,12 @@ class ChessGame
 
         play_sound(sound || :move_self)
       else
+        # Tried to drag a piece off the board, put it back
         @board[@piece_original_pos.x][@piece_original_pos.y] = @piece_held
         @piece_held = nil
         @piece_original_pos = nil
+
+        play_sound(:illegal)
       end
     end
   end
