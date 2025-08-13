@@ -2,7 +2,7 @@ class ChessGame
   def render_game
     render_background
     render_board
-    render_square_highlights unless @promotion
+    render_square_highlights unless @promotion || @game_over
     render_pieces
     render_promotion_picker if @promotion
   end

@@ -11,6 +11,9 @@ FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # Pawn promotion testing
 # FEN = "2b5/PP1PPPpp/2P5/8/8/4p3/pppp1pPP/4N3 w - - 0 1"
 
+# Fifty-move rule testing
+# FEN = "6k1/3R4/2R5/8/8/8/2K5/8 w - - 99 1"
+
 KEY = {
   "p" => :pawn,
   "b" => :bishop,
@@ -54,6 +57,9 @@ class ChessGame
 
     # Set en passant target square
     @en_passant_target = fen[3] == "-" ? nil : notation_to_square(fen[3])
+
+    # For fifty-move rule
+    @halfmove_count = fen[4].to_i
 
     @move_count = fen[5].to_i
   end

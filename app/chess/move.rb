@@ -1,6 +1,8 @@
 class ChessGame
   def resolve_move_input
     if mouse_on_board? && @mouse.key_down.left
+      return if @game_over
+
       # Clicking on the pawn promotion picker
       if @promotion && (picker_pos = mouse_picker_pos)
         promotion_type = PROMOTION_PIECES[picker_pos]
@@ -120,19 +122,34 @@ class ChessGame
         @color_to_move = OTHER_COLOR[@color_to_move]
 
         update_notation(piece_moved, @piece_original_pos, x, y, capture)
-        print_notation
 
-        # Increment move counter
+        # Increment move counters
         @move_count += 1 if piece_moved.color == :black
+        if piece_moved.type != :pawn && !capture
+          @halfmove_count += 1
+        else
+          @halfmove_count = 0
+        end
+
+        checkmate = checkmate?(@color_to_move)
+
+        # Fifty-move rule
+        if @halfmove_count >= 100 && !checkmate
+          add_notation_line("½-½")
+          @game_over = true
+          sound = :game_end
+        end
 
         @piece_original_pos = nil
 
-        if checkmate?(@color_to_move) || stalemate?(@color_to_move)
+        if checkmate || stalemate?(@color_to_move)
+          @game_over = true
           sound = :game_end
         elsif in_check?(@color_to_move)
           sound = :move_check
         end
 
+        print_notation
         play_sound(sound || :move_self)
       else
         # Tried to drag a piece off the board, put it back
