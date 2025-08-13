@@ -11,6 +11,7 @@ class ChessGame
         @promotion = nil
 
         @notation += PIECE_NOTATION[promotion_type]
+        notate_check_or_mate(@color_to_move)
         print_notation
 
         play_sound(:promotion)

@@ -97,20 +97,22 @@ class ChessGame
     notation_segment =
       "#{piece_moved}#{capture ? "x" : ""}#{square_to_notation([x, y])}"
 
-    # Check/mate
+    add_notation_move(notation_segment)
+    notate_check_or_mate(opponent)
+  end
+
+  def notate_check_or_mate(opponent)
     if checkmate?(opponent)
-      notation_segment += "#"
+      @notation += "#"
     elsif in_check?(opponent)
-      notation_segment += "+"
+      @notation += "+"
     end
 
-    add_notation_move(notation_segment)
-
-    # Mate
+    # Game resolution
     if stalemate?(opponent)
       add_notation_line("½-½")
     elsif checkmate?(opponent)
-      add_notation_line("#{piece.color == :white ? '1-0' : '0-1'}")
+      add_notation_line("#{OTHER_COLOR[opponent] ? '1-0' : '0-1'}")
     end
   end
 
