@@ -76,22 +76,7 @@ class ChessGame
     fen = []
 
     # Position
-    # Rotate the board so we can start at the top and read across
-    fen << board_deep_copy.transpose.reverse.map do |rank|
-      empty = 0
-      rank.map do |piece|
-        if piece
-          str = FEN_KEY_SYM_TO_STR[piece.type]
-          out = (empty > 0 ? empty.to_s : "") +
-                (piece.color == :white ? str.upcase : str)
-          empty = 0
-          out
-        else
-          empty += 1
-          ""
-        end
-      end.tap { |r| r[-1] += empty.to_s if empty > 0 }.join
-    end.join("/")
+    fen << get_position
 
     # Color to move
     fen << @color_to_move.to_s[0]
@@ -113,5 +98,24 @@ class ChessGame
     fen << @move_count.to_s
 
     fen.join(" ")
+  end
+
+  def get_position
+    # Rotate the board so we can start at the top and read across
+    board_deep_copy.transpose.reverse.map do |rank|
+      empty = 0
+      rank.map do |piece|
+        if piece
+          str = FEN_KEY_SYM_TO_STR[piece.type]
+          out = (empty > 0 ? empty.to_s : "") +
+                (piece.color == :white ? str.upcase : str)
+          empty = 0
+          out
+        else
+          empty += 1
+          ""
+        end
+      end.tap { |r| r[-1] += empty.to_s if empty > 0 }.join
+    end.join("/")
   end
 end

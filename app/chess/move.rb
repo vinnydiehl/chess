@@ -133,11 +133,17 @@ class ChessGame
 
         checkmate = checkmate?(@color_to_move)
 
-        # Fifty-move rule
-        if @halfmove_count >= 100 && !checkmate
-          add_notation_line("½-½")
-          @game_over = true
-          sound = :game_end
+        # Draw situations
+        if !checkmate
+          @positions_seen << get_position
+
+          # Fifty-move rule and threefold repetition rule
+          if @halfmove_count >= 100 ||
+             @positions_seen.tally.any? { |_, count| count >= 3 }
+            add_notation_line("½-½")
+            @game_over = true
+            sound = :game_end
+          end
         end
 
         @piece_original_pos = nil
