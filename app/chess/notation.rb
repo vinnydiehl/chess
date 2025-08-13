@@ -96,15 +96,16 @@ class ChessGame
     # Generate the entire notation for this particular move
     notation_segment =
       "#{piece_moved}#{capture ? "x" : ""}#{square_to_notation([x, y])}"
-    notation_segment += "#" if checkmate?(opponent)
 
     # Pawn promotion. For now it's always a queen, but this will change.
     if piece.type == :pawn && promoted
       notation_segment += "Q"
     end
 
-    # Check
-    if in_check?(opponent)
+    # Check/mate
+    if checkmate?(opponent)
+      notation_segment += "#"
+    elsif in_check?(opponent)
       notation_segment += "+"
     end
 
