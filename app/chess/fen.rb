@@ -14,13 +14,21 @@ FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # Fifty-move rule testing
 # FEN = "6k1/3R4/2R5/8/8/8/2K5/8 w - - 99 1"
 
-KEY = {
+FEN_KEY_STR_TO_SYM = {
   "p" => :pawn,
-  "b" => :bishop,
   "n" => :knight,
+  "b" => :bishop,
   "r" => :rook,
   "q" => :queen,
-  "k" => :king
+  "k" => :king,
+}
+FEN_KEY_SYM_TO_STR = {
+  pawn: "p",
+  knight: "n",
+  bishop: "b",
+  rook: "r",
+  queen: "q",
+  king: "k",
 }
 
 class ChessGame
@@ -42,7 +50,7 @@ class ChessGame
 
         # Otherwise, put a piece and advance to the next square
         color = c.upcase == c ? :white : :black
-        @board[x][y] = Piece.new(color, KEY[c.downcase])
+        @board[x][y] = Piece.new(color, FEN_KEY_STR_TO_SYM[c.downcase])
         x += 1
       end
 
@@ -62,5 +70,48 @@ class ChessGame
     @halfmove_count = fen[4].to_i
 
     @move_count = fen[5].to_i
+  end
+
+  def get_fen
+    fen = []
+
+    # Position
+    # Rotate the board so we can start at the top and read across
+    fen << board_deep_copy.transpose.reverse.map do |rank|
+      empty = 0
+      rank.map do |piece|
+        if piece
+          str = FEN_KEY_SYM_TO_STR[piece.type]
+          out = (empty > 0 ? empty.to_s : "") +
+                (piece.color == :white ? str.upcase : str)
+          empty = 0
+          out
+        else
+          empty += 1
+          ""
+        end
+      end.tap { |r| r[-1] += empty.to_s if empty > 0 }.join
+    end.join("/")
+
+    # Color to move
+    fen << @color_to_move.to_s[0]
+
+    # Castling availability
+    ca = @white_can_castle_kingside ? "K" : ""
+    ca += "Q" if @white_can_castle_queenside
+    ca += "k" if @black_can_castle_kingside
+    ca += "q" if @black_can_castle_queenside
+    fen << (ca.empty? ? "-" : ca)
+
+    # En passant target square
+    fen << (@en_passant_target ? square_to_notation(@en_passant_target) : "-")
+
+    # Halfmoves
+    fen << @halfmove_count.to_s
+
+    # Moves
+    fen << @move_count.to_s
+
+    fen.join(" ")
   end
 end

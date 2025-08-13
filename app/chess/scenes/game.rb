@@ -33,6 +33,15 @@ class ChessGame
 
   def game_tick
     resolve_move_input
+    process_keyboard_inputs
+  end
+
+  # There are some rendering inputs which aren't included in this
+  # Maybe needs a refactor...
+  def process_keyboard_inputs
+    if @kb.key_down?(:f)
+      puts get_fen
+    end
   end
 
   def board_deep_copy(board = @board)
