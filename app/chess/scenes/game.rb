@@ -26,11 +26,10 @@ class ChessGame
 
     @promotion = nil
 
-    # Keep track of all previous board positions for threefold repetition
-    # We'll do this with FEN
-    @positions_seen = []
-
     set_fen(FEN)
+
+    # Keep track of all previous board positions for threefold repetition
+    @positions_seen = [position_record]
 
     play_sound(:game_start)
   end

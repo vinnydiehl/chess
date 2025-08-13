@@ -135,11 +135,16 @@ class ChessGame
 
         # Draw situations
         if !checkmate
-          @positions_seen << get_position
+          draw = false
 
-          # Fifty-move rule and threefold repetition rule
-          if @halfmove_count >= 100 ||
-             @positions_seen.tally.any? { |_, count| count >= 3 }
+          # Fifty-move rule
+          draw = @halfmove_count >= 100
+
+          # Threefold repetition rule
+          @positions_seen << position_record
+          draw ||= @positions_seen.tally.any? { |_, count| count >= 3 }
+
+          if draw
             add_notation_line("½-½")
             @game_over = true
             sound = :game_end
@@ -166,5 +171,18 @@ class ChessGame
         play_sound(:illegal)
       end
     end
+  end
+
+  # Entry into @positions_seen, for threefold repetition rule
+  # Must have same board position, color to move, and legal moves to count
+  # for repetition, so this will account for en passant and castling
+  def position_record
+    [
+      get_position,
+      @color_to_move,
+      @board.each_with_index.map do |file, trx|
+        file.each_with_index.map { |p, try| p ? legal_moves(p, trx, try) : nil }
+      end,
+    ]
   end
 end
