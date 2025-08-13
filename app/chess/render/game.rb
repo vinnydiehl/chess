@@ -2,8 +2,9 @@ class ChessGame
   def render_game
     render_background
     render_board
-    render_square_highlights
+    render_square_highlights unless @promotion
     render_pieces
+    render_promotion_picker if @promotion
   end
 
   def render_board
@@ -11,7 +12,7 @@ class ChessGame
       primitive_marker: :solid,
       x: @x_offset, y: 0,
       w: @board_size, h: @board_size,
-      **LIGHT_SQUARE_COLOR
+      **LIGHT_SQUARE_COLOR,
     }
 
     [0, 2, 4, 6].each do |rank|
@@ -20,7 +21,7 @@ class ChessGame
           primitive_marker: :solid,
           x: @x_offset + @square_size * (file - 1), y: @square_size * rank,
           w: @square_size, h: @square_size,
-          **DARK_SQUARE_COLOR
+          **DARK_SQUARE_COLOR,
         }
       end
     end
@@ -31,7 +32,7 @@ class ChessGame
           primitive_marker: :solid,
           x: @x_offset + @square_size * (file - 1), y: @square_size * rank,
           w: @square_size, h: @square_size,
-          **DARK_SQUARE_COLOR
+          **DARK_SQUARE_COLOR,
         }
       end
     end
@@ -57,7 +58,7 @@ class ChessGame
         primitive_marker: :solid,
         x: @x_offset + x * @square_size, y: y * @square_size,
         w: @square_size, h: @square_size,
-        **HOVER_HIGHLIGHT_COLOR
+        **HOVER_HIGHLIGHT_COLOR,
       }
     end
   end
@@ -72,7 +73,7 @@ class ChessGame
           primitive_marker: :solid,
           x: @x_offset + x * @square_size, y: y * @square_size,
           w: @square_size, h: @square_size,
-          **LEGAL_MOVE_HIGHLIGHT_COLOR
+          **LEGAL_MOVE_HIGHLIGHT_COLOR,
         }
       end
     end
@@ -90,34 +91,79 @@ class ChessGame
             primitive_marker: :solid,
             x: @x_offset + x * @square_size, y: y * @square_size,
             w: @square_size, h: @square_size,
-            **LEGAL_MOVE_HIGHLIGHT_COLOR
+            **LEGAL_MOVE_HIGHLIGHT_COLOR,
           }
         end
       end
     end
   end
 
+  def render_piece(piece, x, y)
+    @primitives << {
+      x: x, y: y,
+      w: @square_size, h: @square_size,
+      path: piece.sprite_path,
+    }
+  end
+
   def render_pieces
     @board.each_with_index do |pieces, file|
       pieces.each_with_index do |piece, rank|
         if piece
-          @primitives << {
-            x: @x_offset + file * @square_size, y: rank * @square_size,
-            w: @square_size, h: @square_size,
-            path: piece.sprite_path
-          }
+          render_piece(piece, @x_offset + file * @square_size, rank * @square_size)
         end
       end
     end
 
     if @piece_held
       offset = @square_size / 2
+      render_piece(@piece_held, @mouse.x - offset, @mouse.y - offset)
+    end
+  end
 
+  def render_promotion_picker
+    # Render picker background
+    w, h = @square_size * 4, @square_size
+    border_thickness = 5
+    @primitives << {
+      primitive_marker: :solid,
+      x: @promotion_picker_rect[:x] - (border_thickness * 2),
+      y: @promotion_picker_rect[:y] - (border_thickness * 2),
+      w: w + (border_thickness * 4), h: h + (border_thickness * 4),
+      r: 100, g: 100, b: 100,
+    }
+    @primitives << {
+      primitive_marker: :solid,
+      x: @promotion_picker_rect[:x] - border_thickness,
+      y: @promotion_picker_rect[:y] - border_thickness,
+      w: w + (border_thickness * 2), h: h + (border_thickness * 2),
+      **LIGHT_SQUARE_COLOR,
+    }
+    @primitives << {
+      primitive_marker: :solid,
+      **@promotion_picker_rect,
+      **DARK_SQUARE_COLOR, a: 150,
+    }
+
+    # Render hover highlight
+    if mouse_pos = mouse_picker_pos
       @primitives << {
-        x: @mouse.x - offset, y: @mouse.y - offset,
+        primitive_marker: :solid,
+        x: @promotion_picker_rect.x + (mouse_pos * @square_size),
+        y: @promotion_picker_rect.y,
         w: @square_size, h: @square_size,
-        path: @piece_held.sprite_path
+        **HOVER_HIGHLIGHT_COLOR,
       }
+    end
+
+    # Render pieces
+    PROMOTION_PIECES.each_with_index do |type, i|
+      piece = Piece.new(OTHER_COLOR[@color_to_move], type)
+      render_piece(
+        piece,
+        @promotion_picker_rect[:x] + (i * @square_size),
+        @promotion_picker_rect[:y]
+      )
     end
   end
 end

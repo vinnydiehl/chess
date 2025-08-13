@@ -1,8 +1,18 @@
 class ChessGame
   def game_init
-    @x_offset = @screen_width / 4
-    @board_size = @screen_height # for now
+    @board_size = @screen_height
     @square_size = @board_size / 8
+
+    ### Values for input and rendering
+    # Left side of the board
+    @x_offset = @screen_width / 4
+    # Piece picker for pawn promotion
+    @promotion_picker_rect = {
+      x: @x_offset + ((@board_size - @square_size * 4) / 2),
+      y: (@board_size - @square_size) / 2,
+      w: @square_size * 4,
+      h: @square_size,
+    }
 
     @board = Array.new(8) { Array.new(8, nil) }
     @notation = ""
@@ -11,6 +21,8 @@ class ChessGame
     @piece_original_pos = nil
 
     @x_orig, @y_orig = 0, 0
+
+    @promotion = nil
 
     set_fen(FEN)
   end

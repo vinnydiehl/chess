@@ -32,7 +32,7 @@ class ChessGame
     p1&.color == p2&.color && p1&.type == p2&.type
   end
 
-  def update_notation(piece, origin, x, y, capture, promoted)
+  def update_notation(piece, origin, x, y, capture)
     opponent = OTHER_COLOR[piece.color]
 
     ox, oy = origin
@@ -97,11 +97,6 @@ class ChessGame
     notation_segment =
       "#{piece_moved}#{capture ? "x" : ""}#{square_to_notation([x, y])}"
 
-    # Pawn promotion. For now it's always a queen, but this will change.
-    if piece.type == :pawn && promoted
-      notation_segment += "Q"
-    end
-
     # Check/mate
     if checkmate?(opponent)
       notation_segment += "#"
@@ -125,5 +120,9 @@ class ChessGame
     else
       @notation += " #{str}"
     end
+  end
+
+  def print_notation
+    puts "\n#{@notation}"
   end
 end

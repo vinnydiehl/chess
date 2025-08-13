@@ -1,14 +1,27 @@
 class ChessGame
   def resolve_move_input
-    if mouse_on_board?
-      if @mouse.key_down.left
-        @x_orig, @y_orig = mouse_board_pos
+    if mouse_on_board? && @mouse.key_down.left
+      # Clicking on the pawn promotion picker
+      if @promotion && (picker_pos = mouse_picker_pos)
+        promotion_type = PROMOTION_PIECES[picker_pos]
 
-        return if (@board[@x_orig][@y_orig].nil?)
-        @piece_held = @board[@x_orig][@y_orig]
-        @piece_original_pos = [@x_orig, @y_orig]
-        @board[@x_orig][@y_orig] = nil
+        @board[@promotion.x][@promotion.y] =
+          Piece.new(OTHER_COLOR[@color_to_move], promotion_type)
+
+        @promotion = nil
+
+        @notation += PIECE_NOTATION[promotion_type]
+        print_notation
       end
+
+      # Otherwise, see if we're picking up a piece
+
+      @x_orig, @y_orig = mouse_board_pos
+
+      return if (@board[@x_orig][@y_orig].nil?)
+      @piece_held = @board[@x_orig][@y_orig]
+      @piece_original_pos = [@x_orig, @y_orig]
+      @board[@x_orig][@y_orig] = nil
     end
 
     if @piece_held && @mouse.key_up.left
@@ -58,7 +71,6 @@ class ChessGame
           instance_variable_set("@#{color_affected}_can_castle_#{side_affected}", false)
         end
 
-        promoted = false
         if piece_moved.type == :pawn
           # En passant
           ep_y = piece_moved.color == :white ? y - 1 : y + 1
@@ -76,12 +88,9 @@ class ChessGame
           end
 
           # Pawn promotion
-          # For now, this just makes it into a queen.
-          # TODO: allow promotion choice.
           if (piece_moved.color == :white && y == 7) ||
              (piece_moved.color == :black && y == 0)
-            promoted = true
-            @board[x][y] = Piece.new(piece_moved.color, :queen)
+            @promotion = [x, y]
           end
         else
           @en_passant_target = nil
@@ -90,8 +99,8 @@ class ChessGame
         # Switch turns
         @color_to_move = OTHER_COLOR[@color_to_move]
 
-        update_notation(piece_moved, @piece_original_pos, x, y, capture, promoted)
-        puts "\n#{@notation}"
+        update_notation(piece_moved, @piece_original_pos, x, y, capture)
+        print_notation
 
         # Increment move counter
         @move_count += 1 if piece_moved.color == :black
