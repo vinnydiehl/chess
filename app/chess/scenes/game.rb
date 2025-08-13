@@ -19,10 +19,10 @@ class ChessGame
     resolve_move_input
   end
 
-  def board_deep_copy
+  def board_deep_copy(board = @board)
     temp = []
 
-    @board.each do |file|
+    board.each do |file|
       tf = []
       file.each { |piece| tf << piece }
       temp << tf

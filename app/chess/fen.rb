@@ -3,6 +3,10 @@ FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # FEN = "K/8/8/8/8/8/8/kq w KQkq - 0 1"
 # FEN = "8/1Q2K3/p2B1n2/1k4Pp/8/1R3P2/3bP3/1N5q w - h6 0 1"
 
+# Move disambiguation testing
+# FEN = "8/3Q4/8/1Q3Q2/8/5Q2/5QQ1/Q7 w - - 0 1"
+# FEN = "8/8/3n3n/8/8/8/8/8 b - - 0 1"
+
 KEY = {
   "p" => :pawn,
   "b" => :bishop,
@@ -40,7 +44,7 @@ class ChessGame
     end
 
     # Whose turn is it?
-    @color_to_move = { "w" => :white, "b": :black }[fen[1]]
+    @color_to_move = { "w" => :white, "b" => :black }[fen[1]]
 
     set_castling_availability(fen[2])
 

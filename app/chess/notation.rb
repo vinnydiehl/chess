@@ -15,13 +15,21 @@ class ChessGame
     (x + 97).chr
   end
 
+  def rank_notation(y)
+    (y + 1).to_s
+  end
+
   def square_to_notation(square)
-    "#{file_notation(square[0])}#{square[1] + 1}"
+    "#{file_notation(square[0])}#{rank_notation(square[1])}"
   end
 
   def add_notation_line(str)
     @notation << "\n" unless @notation.empty?
     @notation << str
+  end
+
+  def piece_matches?(p1, p2)
+    p1&.color == p2&.color && p1&.type == p2&.type
   end
 
   def update_notation(piece, origin, x, y, capture, promoted)
@@ -40,6 +48,47 @@ class ChessGame
       return
     else
       piece_moved += PIECE_NOTATION[piece.type]
+
+      # Move disambiguation
+      ambiguous_x = false
+      ambiguous_y = false
+
+      # Let's create a board in the position before this move
+      orig_board = board_deep_copy
+      orig_board[x][y] = nil
+      orig_board[ox][oy] = piece
+
+      # We need to loop over the board and check if any pieces of the same type
+      # and color can move to the same square
+      orig_board.each_with_index do |file, obx|
+        file.each_with_index do |other_piece, oby|
+          # Skip the piece which was moved
+          next if [obx, oby] == [ox, oy]
+
+          if piece_matches?(piece, other_piece)
+            moves = legal_moves(other_piece, obx, oby, orig_board, piece.color)
+            if moves&.include?([x, y])
+              ambiguous_x ||= ox == obx
+              ambiguous_y ||= oy == oby
+              if !ambiguous_x && !ambiguous_y
+                # Favor file disambiguation over rank
+                ambiguous_y = true
+              end
+            end
+          end
+        end
+      end
+
+      # Because of the way files are looped over before ranks, we might end up
+      # with a situation when ranks is disambiguated when it doesn't need to be.
+      # We can unset that if that is the case
+      if ambiguous_x && ambiguous_y &&
+         orig_board.none? { |file| piece_matches?(file[oy], piece) }
+        ambiguous_y = false
+      end
+
+      piece_moved += file_notation(ox) if ambiguous_y
+      piece_moved += rank_notation(oy) if ambiguous_x
     end
 
     # Generate the entire notation for this particular move
