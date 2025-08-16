@@ -1,7 +1,5 @@
 class ChessGame
   def game_init
-    @game_over = false
-
     @board_size = @screen_height
     @square_size = @board_size / 8
     @capture_size = @square_size / 2
@@ -20,6 +18,7 @@ class ChessGame
 
     @board = Array.new(8) { Array.new(8, nil) }
     @notation = []
+    @result = nil
 
     @captures = { white: [], black: [] }
 

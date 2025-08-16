@@ -121,16 +121,16 @@ class ChessGame
 
     # Game resolution
     if stalemate?(opponent)
-      add_notation_line("½-½")
+      @result = "½-½"
     elsif checkmate?(opponent)
-      add_notation_line("#{OTHER_COLOR[opponent] ? '1-0' : '0-1'}")
+      @result = "#{OTHER_COLOR[opponent] ? '1-0' : '0-1'}"
     end
   end
 
   def notation_str
-    @notation.each_with_index.map do |move, i|
-      "#{i + 1}. #{move.join(" ")}"
-    end.join("\n")
+    lines = @notation.map.with_index { |move, i| "#{i + 1}. #{move.join(' ')}" }
+    lines << @result if @result
+    lines.join("\n")
   end
 
   def print_notation

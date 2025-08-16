@@ -1,7 +1,7 @@
 class ChessGame
   def resolve_move_input
     if mouse_on_board? && @mouse.key_down.left
-      return if @game_over
+      return if @result
 
       # Clicking on the pawn promotion picker
       if @promotion && (picker_pos = mouse_picker_pos)
@@ -148,16 +148,15 @@ class ChessGame
           draw ||= @positions_seen.tally.any? { |_, count| count >= 3 }
 
           if draw
-            add_notation_line("½-½")
-            @game_over = true
+            @result = "½-½"
             sound = :game_end
           end
         end
 
         @piece_original_pos = nil
 
-        if checkmate || stalemate?(@color_to_move)
-          @game_over = true
+        if (cm = checkmate) || stalemate?(@color_to_move)
+          @result = cm ? (@color_to_play == :black ? "1-0" : "0-1") : "½-½"
           sound = :game_end
         elsif in_check?(@color_to_move)
           sound = :move_check
