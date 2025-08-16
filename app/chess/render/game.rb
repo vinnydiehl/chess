@@ -167,14 +167,17 @@ class ChessGame
 
   def render_notation
     # Draw border
-    @primitives << {
-      primitive_marker: :border,
-      x: @notation_box.x - 1, y: @notation_box.y - 2,
-      w: @notation_box.w + 4, h: @notation_box.h + 5,
-      **NOTATION_BOX_BORDER_COLOR,
-    }
+    unless @notation.empty?
+      @primitives << {
+        primitive_marker: :border,
+        x: @notation_box.x - 1, y: @notation_box.y - 2,
+        w: @notation_box.w + 4, h: @notation_box.h + 5,
+        **NOTATION_BOX_BORDER_COLOR,
+      }
+    end
 
-    @notation[@notation_box_position...(NOTATION_MOVES_HEIGHT + @notation_box_position)].each_with_index do |line, turn_i|
+    @notation[@notation_box_position...(NOTATION_MOVES_HEIGHT + @notation_box_position)]
+      .each_with_index do |line, turn_i|
       y = @notation_y_top - (NOTATION_ROW_HEIGHT * (turn_i + 1))
 
       # Draw row
