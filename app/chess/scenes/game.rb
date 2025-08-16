@@ -15,8 +15,16 @@ class ChessGame
       h: @square_size,
     }
     @captures_x_offset = @x_offset + @board_size + BOARD_PADDING
-    # Notation
+    # Notation box
     @notation_y_top = @screen_height - @capture_size - 10
+    notation_x = @x_offset + @board_size + NOTATION_X_PADDING
+    @notation_box = {
+      x: notation_x,
+      y: @notation_y_top - NOTATION_BOX_HEIGHT,
+      w: @screen_width - notation_x - NOTATION_X_PADDING,
+      h: NOTATION_MOVES_HEIGHT * NOTATION_ROW_HEIGHT
+    }
+    @notation_box_position = 0
 
     @board = Array.new(8) { Array.new(8, nil) }
     @notation = []
@@ -41,15 +49,8 @@ class ChessGame
 
   def game_tick
     resolve_move_input
+    process_mouse_inputs
     process_keyboard_inputs
-  end
-
-  # There are some rendering inputs which aren't included in this
-  # Maybe needs a refactor...
-  def process_keyboard_inputs
-    if @kb.key_down?(:f)
-      puts get_fen
-    end
   end
 
   def board_deep_copy(board = @board)

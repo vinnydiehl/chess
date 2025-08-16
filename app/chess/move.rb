@@ -162,6 +162,11 @@ class ChessGame
           sound = :move_check
         end
 
+        # Auto-scroll notation
+        if @notation_box_position < @notation.size - NOTATION_MOVES_HEIGHT
+          @notation_box_position += 1
+        end
+
         print_notation
         play_sound(sound || :move_self)
       else

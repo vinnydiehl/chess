@@ -18,4 +18,33 @@ class ChessGame
     return unless @mouse.intersect_rect?(@promotion_picker_rect)
     ((@mouse.x - @promotion_picker_rect.x) / @square_size).floor
   end
+
+  def mouse_in_notation_box?
+    @mouse.intersect_rect?(@notation_box)
+  end
+
+  # I'm adding this, but not all mouse inputs are included here.
+  # Maybe needs a refactor...
+  def process_mouse_inputs
+    if (direction = @mouse.wheel&.y)
+      scroll = direction > 0 ? :up : :down
+      case scroll
+      when :up
+        @notation_box_position -= 1 if @notation_box_position > 0
+      when :down
+        if @notation_box_position < @notation.size - NOTATION_MOVES_HEIGHT
+          @notation_box_position += 1
+        end
+      end
+    end
+  end
+
+  # There are some rendering inputs which aren't included in this
+  # Maybe needs a refactor...
+  # Noticing a trend here?
+  def process_keyboard_inputs
+    if @kb.key_down?(:f)
+      puts get_fen
+    end
+  end
 end

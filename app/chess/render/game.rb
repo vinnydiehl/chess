@@ -166,34 +166,31 @@ class ChessGame
   end
 
   def render_notation
-    x = @x_offset + @board_size + NOTATION_X_PADDING
-    w = @screen_width - x - NOTATION_X_PADDING
-
     # Draw border
     @primitives << {
       primitive_marker: :border,
-      x: x - 1, y: @notation_y_top - NOTATION_BOX_HEIGHT - 2,
-      w: w + 4, h: NOTATION_BOX_HEIGHT + 5,
+      x: @notation_box.x - 1, y: @notation_box.y - 2,
+      w: @notation_box.w + 4, h: @notation_box.h + 5,
       **NOTATION_BOX_BORDER_COLOR,
     }
 
-    @notation[0...NOTATION_MOVES_HEIGHT].each_with_index do |line, turn_i|
+    @notation[@notation_box_position...(NOTATION_MOVES_HEIGHT + @notation_box_position)].each_with_index do |line, turn_i|
       y = @notation_y_top - (NOTATION_ROW_HEIGHT * (turn_i + 1))
 
       # Draw row
       @primitives << {
         primitive_marker: :solid,
-        x: x, y: y,
-        w: w, h: NOTATION_ROW_HEIGHT,
+        x: @notation_box.x, y: y,
+        w: @notation_box.w, h: NOTATION_ROW_HEIGHT,
         **(turn_i.even? ? NOTATION_DARK_COLOR : NOTATION_LIGHT_COLOR),
       }
 
       # Draw move number
       @primitives << {
         primitive_marker: :label,
-        x: x + NOTATION_MARGIN,
+        x: @notation_box.x + NOTATION_MARGIN,
         y: y + NOTATION_ROW_HEIGHT / 4 - NOTATION_Y_PADDING,
-        text: "#{turn_i + 1}.",
+        text: "#{turn_i + 1 + @notation_box_position}.",
         alignment_enum: 0,
         vertical_alignment_enum: 0,
         size_enum: NOTATION_SIZE,
@@ -204,7 +201,8 @@ class ChessGame
         # Draw move notation
         @primitives << {
           primitive_marker: :label,
-          x: x + NOTATION_MOVE_NUM_PADDING + (move_i * w / 2.5),
+          x: @notation_box.x +
+             NOTATION_MOVE_NUM_PADDING + (move_i * @notation_box.w / 2.5),
           y: y + NOTATION_ROW_HEIGHT / 4 - NOTATION_Y_PADDING,
           text: move,
           alignment_enum: 0,
