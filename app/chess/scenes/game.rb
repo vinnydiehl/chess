@@ -17,7 +17,7 @@ class ChessGame
     }
 
     @board = Array.new(8) { Array.new(8, nil) }
-    @notation = ""
+    @notation = []
 
     @piece_held = nil
     @piece_original_pos = nil

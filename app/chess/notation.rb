@@ -23,9 +23,16 @@ class ChessGame
     "#{file_notation(square[0])}#{rank_notation(square[1])}"
   end
 
-  def add_notation_line(str)
-    @notation << "\n" unless @notation.empty?
-    @notation << str
+  def add_notation_line(arr)
+    @notation << arr
+  end
+
+  def add_notation_segment(str)
+    if @notation.last&.size == 1
+      @notation.last << str
+    else
+      @notation << [str]
+    end
   end
 
   def piece_matches?(p1, p2)
@@ -44,7 +51,7 @@ class ChessGame
       piece_moved += file_notation(origin[0]) if capture
     elsif piece.type == :king && (offset = x - ox).abs == 2
       # Castling
-      add_notation_move(offset < 0 ? "0-0-0" : "0-0")
+      add_notation_segment(offset < 0 ? "0-0-0" : "0-0")
       return
     else
       piece_moved += PIECE_NOTATION[piece.type]
@@ -97,7 +104,7 @@ class ChessGame
     notation_segment =
       "#{piece_moved}#{capture ? "x" : ""}#{square_to_notation([x, y])}"
 
-    add_notation_move(notation_segment)
+    add_notation_segment(notation_segment)
     notate_check_or_mate(opponent)
   end
 
@@ -116,15 +123,13 @@ class ChessGame
     end
   end
 
-  def add_notation_move(str)
-    if @color_to_move == :black
-      add_notation_line("#{@move_count}. #{str}")
-    else
-      @notation += " #{str}"
-    end
+  def notation_str
+    @notation.each_with_index.map do |move, i|
+      "#{i + 1}. #{move.join(" ")}"
+    end.join("\n")
   end
 
   def print_notation
-    puts "\n#{@notation}"
+    puts "\n#{notation_str}"
   end
 end
