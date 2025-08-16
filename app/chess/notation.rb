@@ -35,6 +35,10 @@ class ChessGame
     end
   end
 
+  def append_notation(str)
+    @notation[-1][-1] += str
+  end
+
   def piece_matches?(p1, p2)
     p1&.color == p2&.color && p1&.type == p2&.type
   end
@@ -110,9 +114,9 @@ class ChessGame
 
   def notate_check_or_mate(opponent)
     if checkmate?(opponent)
-      @notation[-1][-1] += "#"
+      append_notation("#")
     elsif in_check?(opponent)
-      @notation[-1][-1] += "+"
+      append_notation("+")
     end
 
     # Game resolution
