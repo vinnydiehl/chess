@@ -4,6 +4,7 @@ class ChessGame
     render_board
     render_square_highlights unless @promotion || @game_over
     render_pieces
+    render_captures
     render_promotion_picker if @promotion
   end
 
@@ -98,10 +99,10 @@ class ChessGame
     end
   end
 
-  def render_piece(piece, x, y)
+  def render_piece(piece, x, y, size = @square_size)
     @primitives << {
       x: x, y: y,
-      w: @square_size, h: @square_size,
+      w: size, h: size,
       path: piece.sprite_path,
     }
   end
@@ -118,6 +119,17 @@ class ChessGame
     if @piece_held
       offset = @square_size / 2
       render_piece(@piece_held, @mouse.x - offset, @mouse.y - offset)
+    end
+  end
+
+  def render_captures
+    { white: 0, black: @board_size - @capture_size }.each do |color, y|
+      x_offset = @captures_x_offset
+      @captures[color].sort_by { |p| PIECE_SORTING_VALUE[p.type] }
+                      .each_with_index do |piece, i|
+        x_offset += CAPTURE_OVERLAP[piece.type] unless i == 0
+        render_piece(piece, x_offset, y, @capture_size)
+      end
     end
   end
 

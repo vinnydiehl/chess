@@ -4,10 +4,11 @@ class ChessGame
 
     @board_size = @screen_height
     @square_size = @board_size / 8
+    @capture_size = @square_size / 2
 
     ### Values for input and rendering
     # Left side of the board
-    @x_offset = @screen_width / 4
+    @x_offset = @screen_width / 6
     # Piece picker for pawn promotion
     @promotion_picker_rect = {
       x: @x_offset + ((@board_size - @square_size * 4) / 2),
@@ -15,9 +16,12 @@ class ChessGame
       w: @square_size * 4,
       h: @square_size,
     }
+    @captures_x_offset = @x_offset + @board_size + BOARD_MARGIN
 
     @board = Array.new(8) { Array.new(8, nil) }
     @notation = []
+
+    @captures = { white: [], black: [] }
 
     @piece_held = nil
     @piece_original_pos = nil

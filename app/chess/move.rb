@@ -57,8 +57,11 @@ class ChessGame
         sound = nil
 
         # Is this a capture?
-        capture = !@board[x][y].nil?
-        sound = :capture if capture
+        capture = @board[x][y]
+        if capture
+          @captures[@color_to_move] << capture
+          sound = :capture
+        end
 
         # Resolve move
         @board[x][y] = @piece_held
