@@ -1,7 +1,8 @@
 SCENES = %w[game].freeze
 
-%w[castling check chess colors constants fen
-   input mate move notation piece vision].each { |f| require "app/chess/#{f}.rb" }
+%w[constants castling check chess colors fen
+   input mate material move notation piece
+   vision].each { |f| require "app/chess/#{f}.rb" }
 
 %w[scenes render].each { |dir| SCENES.each { |f| require "app/chess/#{dir}/#{f}.rb" } }
 

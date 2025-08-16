@@ -7,7 +7,7 @@ class ChessGame
   end
 
   # Set query methods e.g. white_can_castle_kingside?
-  [:white, :black].each do |color|
+  COLORS.each do |color|
     [:kingside, :queenside].each do |side|
       define_method("#{color}_can_castle_#{side}?") do
         instance_variable_get("@#{color}_can_castle_#{side}")

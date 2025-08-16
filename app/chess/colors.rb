@@ -1,3 +1,7 @@
+TEXT_COLOR = {
+  r: 255, g: 255, b: 255
+}
+
 DARK_SQUARE_COLOR = {
   r: 118, g: 150, b: 86
 }

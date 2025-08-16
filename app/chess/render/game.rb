@@ -4,7 +4,7 @@ class ChessGame
     render_board
     render_square_highlights unless @promotion || @game_over
     render_pieces
-    render_captures
+    render_captures_and_material
     render_promotion_picker if @promotion
   end
 
@@ -122,15 +122,45 @@ class ChessGame
     end
   end
 
-  def render_captures
-    { white: 0, black: @board_size - @capture_size }.each do |color, y|
+  def render_captures_and_material
+    COLORS.each do |color|
       x_offset = @captures_x_offset
+      y_offset = color == :white ? 0 : @board_size - @capture_size
+
       @captures[color].sort_by { |p| PIECE_SORTING_VALUE[p.type] }
                       .each_with_index do |piece, i|
         x_offset += CAPTURE_OVERLAP[piece.type] unless i == 0
-        render_piece(piece, x_offset, y, @capture_size)
+        render_piece(piece, x_offset, y_offset, @capture_size)
       end
+
+      render_material(color, material_values, x_offset, y_offset)
     end
+  end
+
+  def render_material(color, material, x_offset, y_offset)
+    opponent = OTHER_COLOR[color]
+    if material[color] <= material[opponent]
+      return
+    end
+
+    differential = material[color] - material[opponent]
+
+    # Adjust left margin
+    if @captures[color].empty?
+      x_offset += BOARD_MARGIN
+    else
+      x_offset += @capture_size
+    end
+
+    @labels << {
+      x: x_offset,
+      y: y_offset,
+      text: "+#{differential}",
+      alignment_enum: 0,
+      vertical_alignment_enum: 0,
+      size_enum: 0,
+      **TEXT_COLOR,
+    }
   end
 
   def render_promotion_picker

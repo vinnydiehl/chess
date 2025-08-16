@@ -1,9 +1,11 @@
+COLORS = %i[white black]
+
 OTHER_COLOR = {
   white: :black,
   black: :white
 }
 
-PROMOTION_PIECES = [:queen, :rook, :bishop, :knight]
+PROMOTION_PIECES = %i[queen rook bishop knight]
 
 # Define material values
 PIECE_VALUE = {
