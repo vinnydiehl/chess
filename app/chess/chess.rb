@@ -18,7 +18,6 @@ class ChessGame
     @primitives = args.outputs.primitives
     @static_primitives = args.outputs.static_primitives
     @sprites = args.outputs.sprites
-    @labels = args.outputs.labels
 
     @scene_stack = []
     @scene = :game

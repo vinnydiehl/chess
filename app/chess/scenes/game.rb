@@ -14,7 +14,9 @@ class ChessGame
       w: @square_size * 4,
       h: @square_size,
     }
-    @captures_x_offset = @x_offset + @board_size + BOARD_MARGIN
+    @captures_x_offset = @x_offset + @board_size + BOARD_PADDING
+    # Notation
+    @notation_y_top = @screen_height - @capture_size - 10
 
     @board = Array.new(8) { Array.new(8, nil) }
     @notation = []

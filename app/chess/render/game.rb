@@ -2,9 +2,10 @@ class ChessGame
   def render_game
     render_background
     render_board
-    render_square_highlights unless @promotion || @game_over
+    render_square_highlights unless @promotion || @result
     render_pieces
     render_captures_and_material
+    render_notation
     render_promotion_picker if @promotion
   end
 
@@ -147,12 +148,13 @@ class ChessGame
 
     # Adjust left margin
     if @captures[color].empty?
-      x_offset += BOARD_MARGIN
+      x_offset += BOARD_PADDING
     else
       x_offset += @capture_size
     end
 
-    @labels << {
+    @primitives << {
+      primitive_marker: :label,
       x: x_offset,
       y: y_offset,
       text: "+#{differential}",
@@ -161,6 +163,57 @@ class ChessGame
       size_enum: 0,
       **TEXT_COLOR,
     }
+  end
+
+  def render_notation
+    x = @x_offset + @board_size + NOTATION_X_PADDING
+    w = @screen_width - x - NOTATION_X_PADDING
+
+    # Draw border
+    @primitives << {
+      primitive_marker: :border,
+      x: x - 1, y: @notation_y_top - NOTATION_BOX_HEIGHT - 2,
+      w: w + 4, h: NOTATION_BOX_HEIGHT + 5,
+      **NOTATION_BOX_BORDER_COLOR,
+    }
+
+    @notation[0...NOTATION_MOVES_HEIGHT].each_with_index do |line, turn_i|
+      y = @notation_y_top - (NOTATION_ROW_HEIGHT * (turn_i + 1))
+
+      # Draw row
+      @primitives << {
+        primitive_marker: :solid,
+        x: x, y: y,
+        w: w, h: NOTATION_ROW_HEIGHT,
+        **(turn_i.even? ? NOTATION_DARK_COLOR : NOTATION_LIGHT_COLOR),
+      }
+
+      # Draw move number
+      @primitives << {
+        primitive_marker: :label,
+        x: x + NOTATION_MARGIN,
+        y: y + NOTATION_ROW_HEIGHT / 4 - NOTATION_Y_PADDING,
+        text: "#{turn_i + 1}.",
+        alignment_enum: 0,
+        vertical_alignment_enum: 0,
+        size_enum: NOTATION_SIZE,
+        **TEXT_COLOR,
+      }
+
+      line.each_with_index do |move, move_i|
+        # Draw move notation
+        @primitives << {
+          primitive_marker: :label,
+          x: x + NOTATION_MOVE_NUM_PADDING + (move_i * w / 2.5),
+          y: y + NOTATION_ROW_HEIGHT / 4 - NOTATION_Y_PADDING,
+          text: move,
+          alignment_enum: 0,
+          vertical_alignment_enum: 0,
+          size_enum: NOTATION_SIZE,
+          **TEXT_COLOR,
+        }
+      end
+    end
   end
 
   def render_promotion_picker

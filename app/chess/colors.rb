@@ -1,3 +1,7 @@
+BACKGROUND_COLOR = {
+  r: 63, g: 63, b: 63,
+}
+
 TEXT_COLOR = {
   r: 255, g: 255, b: 255
 }
@@ -16,4 +20,16 @@ HOVER_HIGHLIGHT_COLOR = {
 
 LEGAL_MOVE_HIGHLIGHT_COLOR = {
   r: 255, g: 0, b: 0, a: 100
+}
+
+NOTATION_BOX_BORDER_COLOR = {
+  r: 100, g: 0, b: 0
+}
+
+NOTATION_DARK_COLOR = {
+  r: 75, g: 75, b: 75
+}
+
+NOTATION_LIGHT_COLOR = {
+  r: 100, g: 100, b: 100
 }
