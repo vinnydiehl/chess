@@ -110,9 +110,9 @@ class ChessGame
 
   def notate_check_or_mate(opponent)
     if checkmate?(opponent)
-      @notation += "#"
+      @notation[-1][-1] += "#"
     elsif in_check?(opponent)
-      @notation += "+"
+      @notation[-1][-1] += "+"
     end
 
     # Game resolution
