@@ -55,12 +55,9 @@ class ChessGame
         # get set, the normal sound will be played later
         sound = nil
 
-        # Is this a capture?
+        # If we've captured a piece, save it
+        # En passant will be dealt with later
         capture = @board[x][y]
-        if capture
-          @captures[@color_to_move] << capture
-          sound = :capture
-        end
 
         # Resolve move
         @board[x][y] = @piece_held
@@ -105,6 +102,7 @@ class ChessGame
           else
             # Capture
             if [x, y] == @en_passant_target
+              capture = @board[x][ep_y]
               @board[x][ep_y] = nil
             end
 
@@ -118,6 +116,11 @@ class ChessGame
           end
         else
           @en_passant_target = nil
+        end
+
+        if capture
+          @captures[@color_to_move] << capture
+          sound = :capture
         end
 
         # Switch turns
