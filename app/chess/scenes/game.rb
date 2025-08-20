@@ -3,6 +3,7 @@ class ChessGame
     @board_size = @screen_height
     @square_size = @board_size / 8
     @capture_size = @square_size / 2
+    @legal_marker_size = @square_size / 4
 
     ### Values for input and rendering
     # Left side of the board
@@ -25,6 +26,8 @@ class ChessGame
       h: NOTATION_MOVES_HEIGHT * NOTATION_ROW_HEIGHT
     }
     @notation_box_position = 0
+    # Offset to center the legal move marker in the square
+    @legal_center_offset = (@square_size / 2) - (@legal_marker_size / 2)
 
     @board = Array.new(8) { Array.new(8, nil) }
     @notation = []

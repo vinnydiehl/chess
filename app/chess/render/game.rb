@@ -84,14 +84,42 @@ class ChessGame
     if (piece = @piece_held || @piece_selected)
       moves = legal_moves(piece, *@piece_original_pos)
       return unless moves
-      moves.each do |move|
-        x, y = move
-        @primitives << {
-          primitive_marker: :solid,
-          x: @x_offset + x * @square_size, y: y * @square_size,
-          w: @square_size, h: @square_size,
-          **LEGAL_MOVE_HIGHLIGHT_COLOR,
-        }
+
+      # Highlight selected piece square
+      @primitives << {
+        primitive_marker: :solid,
+        x: @x_offset + @x_orig * @square_size,
+        y: @y_orig * @square_size,
+        w: @square_size, h: @square_size,
+        **SELECTED_PIECE_HIGHLIGHT_COLOR,
+      }
+
+      # Render markers
+      moves.each do |x, y|
+        if @board[x][y]
+          @primitives << {
+            x: @x_offset + x * @square_size, y: y * @square_size,
+            w: @square_size, h: @square_size,
+            path: "sprites/shapes/legal_move_capture.png",
+            a: 100,
+          }
+        elsif piece.type == :pawn && [x, y] == @en_passant_target
+          @primitives << {
+            x: @x_offset + x * @square_size + @legal_center_offset,
+            y: y * @square_size + @legal_center_offset,
+            w: @legal_marker_size, h: @legal_marker_size,
+            path: "sprites/shapes/legal_move_en_passant.png",
+            a: 100,
+          }
+        else
+          @primitives << {
+            x: @x_offset + x * @square_size + @legal_center_offset,
+            y: y * @square_size + @legal_center_offset,
+            w: @legal_marker_size, h: @legal_marker_size,
+            path: "sprites/shapes/legal_move_empty_square.png",
+            a: 100,
+          }
+        end
       end
     end
   end
