@@ -1,9 +1,9 @@
 class ChessGame
   def mouse_board_pos
-    x, y = [
+    x, y = true_square([
       ((@mouse.x - @x_offset) / @square_size).floor,
       (@mouse.y / @square_size).floor
-    ]
+    ])
 
     [x, y].all? { |n| (0..7).include? n } ? [x, y] : nil
   end
@@ -49,6 +49,10 @@ class ChessGame
 
     if @kb.key_down?(:n)
       print_notation
+    end
+
+    if @kb.key_down?(:space)
+      @color_view = OTHER_COLOR[@color_view]
     end
   end
 end

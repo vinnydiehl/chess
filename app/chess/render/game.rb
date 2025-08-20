@@ -1,5 +1,8 @@
 class ChessGame
   def render_game
+    # If we're viewing as black, flip the board
+    @board_view = @color_view == :white ? @board : rotate_180(@board)
+
     render_background
     render_board
     render_square_highlights
@@ -51,7 +54,7 @@ class ChessGame
   end
 
   def render_last_move_highlight
-    @last_move_squares.each do |x, y|
+    @last_move_squares.map { |s| true_square(s) }.each do |x, y|
       @primitives << {
         primitive_marker: :solid,
         x: @x_offset + x * @square_size, y: y * @square_size,
@@ -65,11 +68,7 @@ class ChessGame
     # Highlight square under cursor, unless a piece is picked up, then leave
     # the highlight on the piece's original position
     if mouse_on_board? || @piece_held
-      if @piece_held
-        x, y = @piece_original_pos
-      else
-        x, y = mouse_board_pos
-      end
+      x, y = true_square(@piece_held ? @piece_original_pos : mouse_board_pos)
 
       @primitives << {
         primitive_marker: :solid,
@@ -82,28 +81,28 @@ class ChessGame
 
   def render_legal_highlights
     if (piece = @piece_held || @piece_selected)
-      moves = legal_moves(piece, *@piece_original_pos)
+      moves = legal_moves(piece, *@piece_original_pos).map { |m| true_square(m) }
       return unless moves
 
       # Highlight selected piece square
       @primitives << {
         primitive_marker: :solid,
-        x: @x_offset + @x_orig * @square_size,
-        y: @y_orig * @square_size,
+        x: @x_offset + true_index(@x_orig) * @square_size,
+        y: true_index(@y_orig) * @square_size,
         w: @square_size, h: @square_size,
         **SELECTED_PIECE_HIGHLIGHT_COLOR,
       }
 
       # Render markers
       moves.each do |x, y|
-        if @board[x][y]
+        if @board_view[x][y]
           @primitives << {
             x: @x_offset + x * @square_size, y: y * @square_size,
             w: @square_size, h: @square_size,
             path: "sprites/legal_markers/capture.png",
             a: 100,
           }
-        elsif piece.type == :pawn && [x, y] == @en_passant_target
+        elsif piece.type == :pawn && true_square([x, y]) == @en_passant_target
           @primitives << {
             x: @x_offset + x * @square_size + @legal_center_offset,
             y: y * @square_size + @legal_center_offset,
@@ -131,7 +130,7 @@ class ChessGame
         vision = color_vision(color)
         return unless vision
         vision.each do |square|
-          x, y = square
+          x, y = true_square(square)
           @primitives << {
             primitive_marker: :solid,
             x: @x_offset + x * @square_size, y: y * @square_size,
@@ -152,7 +151,7 @@ class ChessGame
   end
 
   def render_pieces
-    @board.each_with_index do |pieces, file|
+    @board_view.each_with_index do |pieces, file|
       pieces.each_with_index do |piece, rank|
         if piece
           render_piece(piece, @x_offset + file * @square_size, rank * @square_size)
@@ -169,7 +168,9 @@ class ChessGame
   def render_captures_and_material
     COLORS.each do |color|
       x_offset = @captures_x_offset
-      y_offset = color == :white ? 0 : @board_size - @capture_size
+      y_offset = [color, @color_view].all? { |c| c == :white } \
+                 ? 0
+                 : @board_size - @capture_size
 
       @captures[color].sort_by { |p| PIECE_SORTING_VALUE[p.type] }
                       .each_with_index do |piece, i|

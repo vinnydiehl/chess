@@ -4,6 +4,7 @@ class ChessGame
     @square_size = @board_size / 8
     @capture_size = @square_size / 2
     @legal_marker_size = @square_size / 4
+    @color_view = :white
 
     ### Values for input and rendering
     # Left side of the board
