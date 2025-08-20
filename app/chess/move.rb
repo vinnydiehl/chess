@@ -20,10 +20,16 @@ class ChessGame
 
       # Otherwise, see if we're picking up a piece
 
+      previous_selection = [@x_orig, @y_orig]
       @x_orig, @y_orig = mouse_board_pos
       piece = @board[@x_orig][@y_orig]
 
       return unless piece
+
+      # If switching selections, this needs to be reset
+      if [@x_orig, @y_orig] != previous_selection
+        @piece_already_selected = false
+      end
 
       # Don't even let the piece be picked up if it's not
       # that color's turn
@@ -61,6 +67,7 @@ class ChessGame
             @piece_already_selected = true
             play_sound(:illegal)
           end
+
           return
         end
 
