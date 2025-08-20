@@ -100,7 +100,7 @@ class ChessGame
           @primitives << {
             x: @x_offset + x * @square_size, y: y * @square_size,
             w: @square_size, h: @square_size,
-            path: "sprites/shapes/legal_move_capture.png",
+            path: "sprites/legal_markers/capture.png",
             a: 100,
           }
         elsif piece.type == :pawn && [x, y] == @en_passant_target
@@ -108,7 +108,7 @@ class ChessGame
             x: @x_offset + x * @square_size + @legal_center_offset,
             y: y * @square_size + @legal_center_offset,
             w: @legal_marker_size, h: @legal_marker_size,
-            path: "sprites/shapes/legal_move_en_passant.png",
+            path: "sprites/legal_markers/en_passant.png",
             a: 100,
           }
         else
@@ -116,7 +116,7 @@ class ChessGame
             x: @x_offset + x * @square_size + @legal_center_offset,
             y: y * @square_size + @legal_center_offset,
             w: @legal_marker_size, h: @legal_marker_size,
-            path: "sprites/shapes/legal_move_empty_square.png",
+            path: "sprites/legal_markers/empty_square.png",
             a: 100,
           }
         end
