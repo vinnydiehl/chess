@@ -33,6 +33,7 @@ class ChessGame
       end
 
       @piece_held = piece
+      @piece_selected = piece
       @piece_original_pos = [@x_orig, @y_orig]
       @board[@x_orig][@y_orig] = nil
     end
@@ -43,11 +44,23 @@ class ChessGame
 
         # Reject move if releasing in the sqaure of origin,
         # or the move is illegal
-        if [@x_orig, @y_orig] == [x, y] ||
+        if (released_in_origin = [@x_orig, @y_orig] == [x, y]) ||
            (illegal = !legal_moves(@piece_held, @x_orig, @y_orig)&.include?([x, y]))
           @board[@x_orig][@y_orig] = @piece_held
           @piece_held = nil
-          play_sound(:illegal) if illegal
+
+          if released_in_origin && @piece_selected
+            @piece_already_selected = !@piece_already_selected
+            unless @piece_already_selected
+              @piece_selected = nil
+              @piece_original_pos = nil
+            end
+          end
+
+          if illegal
+            @piece_already_selected = true
+            play_sound(:illegal)
+          end
           return
         end
 
@@ -63,6 +76,7 @@ class ChessGame
         @board[x][y] = @piece_held
         @piece_held = nil
         piece_moved = @board[x][y]
+        @piece_selected = nil
 
         # Castling
         if piece_moved.type == :king
@@ -173,7 +187,7 @@ class ChessGame
         # Tried to drag a piece off the board, put it back
         @board[@piece_original_pos.x][@piece_original_pos.y] = @piece_held
         @piece_held = nil
-        @piece_original_pos = nil
+        @piece_already_selected = true
 
         play_sound(:illegal)
       end

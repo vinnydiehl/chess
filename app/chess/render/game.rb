@@ -45,7 +45,7 @@ class ChessGame
 
     unless @promotion || @result
       render_hover_highlight
-      render_legal_highlights
+      render_legal_highlights if @piece_selected
       render_vision_highlights
     end
   end
@@ -81,8 +81,8 @@ class ChessGame
   end
 
   def render_legal_highlights
-    if @piece_held
-      moves = legal_moves(@piece_held, *@piece_original_pos)
+    if (piece = @piece_held || @piece_selected)
+      moves = legal_moves(piece, *@piece_original_pos)
       return unless moves
       moves.each do |move|
         x, y = move

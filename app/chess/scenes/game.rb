@@ -35,6 +35,9 @@ class ChessGame
     @piece_held = nil
     @piece_original_pos = nil
 
+    @piece_selected = nil
+    @piece_already_selected = false
+
     @last_move_squares = nil
 
     @x_orig, @y_orig = 0, 0
