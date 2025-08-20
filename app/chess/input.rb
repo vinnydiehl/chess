@@ -46,5 +46,9 @@ class ChessGame
     if @kb.key_down?(:f)
       puts get_fen
     end
+
+    if @kb.key_down?(:n)
+      print_notation
+    end
   end
 end

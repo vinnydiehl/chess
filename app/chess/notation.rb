@@ -118,13 +118,6 @@ class ChessGame
     elsif in_check?(opponent)
       append_notation("+")
     end
-
-    # Game resolution
-    if stalemate?(opponent)
-      @result = "½-½"
-    elsif checkmate?(opponent)
-      @result = "#{OTHER_COLOR[opponent] ? '1-0' : '0-1'}"
-    end
   end
 
   def notation_str

@@ -14,7 +14,6 @@ class ChessGame
 
         append_notation(PIECE_NOTATION[promotion_type])
         notate_check_or_mate(@color_to_move)
-        print_notation
 
         play_sound(:promotion)
       end
@@ -156,7 +155,7 @@ class ChessGame
         @piece_original_pos = nil
 
         if (cm = checkmate) || stalemate?(@color_to_move)
-          @result = cm ? (@color_to_play == :black ? "1-0" : "0-1") : "½-½"
+          @result = cm ? (@color_to_move == :black ? "1-0" : "0-1") : "½-½"
           sound = :game_end
         elsif in_check?(@color_to_move)
           sound = :move_check
@@ -167,7 +166,6 @@ class ChessGame
           @notation_box_position += 1
         end
 
-        print_notation
         play_sound(sound || :move_self)
       else
         # Tried to drag a piece off the board, put it back
