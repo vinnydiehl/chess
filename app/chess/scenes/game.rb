@@ -41,6 +41,16 @@ class ChessGame
 
     @promotion = nil
 
+    # This will set the following:
+    #   @board
+    #   @color_to_move
+    #   @white_can_castle_kingside
+    #   @white_can_castle_queenside
+    #   @black_can_castle_kingside
+    #   @black_can_castle_queenside
+    #   @en_passant_target
+    #   @halfmove_count
+    #   @move_count
     set_fen(FEN)
 
     # Keep track of all previous board positions for threefold repetition
