@@ -176,7 +176,11 @@ class ChessGame
       }
     end
 
-    @notation[@notation_box_position...(NOTATION_MOVES_HEIGHT + @notation_box_position)]
+    notation = @notation.clone
+    # If there's a result, we'll just throw it onto the end
+    notation << @result if @result
+
+    notation[@notation_box_position...(NOTATION_MOVES_HEIGHT + @notation_box_position)]
       .each_with_index do |line, turn_i|
       y = @notation_y_top - (NOTATION_ROW_HEIGHT * (turn_i + 1))
 
@@ -187,6 +191,22 @@ class ChessGame
         w: @notation_box.w, h: NOTATION_ROW_HEIGHT,
         **(turn_i.even? ? NOTATION_DARK_COLOR : NOTATION_LIGHT_COLOR),
       }
+
+      # Draw result
+      if @result && line == @result
+        @primitives << {
+          primitive_marker: :label,
+          x: @notation_box.x + (@notation_box.w / 2),
+          y: y + NOTATION_ROW_HEIGHT / 4 - NOTATION_Y_PADDING,
+          text: @result,
+          alignment_enum: 1,
+          vertical_alignment_enum: 0,
+          size_enum: NOTATION_SIZE,
+          **TEXT_COLOR,
+        }
+
+        return
+      end
 
       # Draw move number
       @primitives << {

@@ -129,4 +129,14 @@ class ChessGame
   def print_notation
     puts "\n#{notation_str}"
   end
+
+  # Scroll notation to the last position
+  def auto_scroll_notation
+    @notation_box_position = [0, notation_box_row_count - NOTATION_MOVES_HEIGHT].max
+  end
+
+  def notation_box_row_count
+    # The result isn't part of @notation but needs to be displayed
+    @notation.size + (@result ? 1 : 0)
+  end
 end

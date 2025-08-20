@@ -32,7 +32,7 @@ class ChessGame
       when :up
         @notation_box_position -= 1 if @notation_box_position > 0
       when :down
-        if @notation_box_position < @notation.size - NOTATION_MOVES_HEIGHT
+        if @notation_box_position < notation_box_row_count - NOTATION_MOVES_HEIGHT
           @notation_box_position += 1
         end
       end
