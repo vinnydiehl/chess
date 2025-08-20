@@ -155,6 +155,8 @@ class ChessGame
           end
         end
 
+        @last_move_squares = [@piece_original_pos, [x, y]]
+
         @piece_original_pos = nil
 
         if (cm = checkmate) || stalemate?(@color_to_move)

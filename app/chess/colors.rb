@@ -14,6 +14,10 @@ LIGHT_SQUARE_COLOR = {
   r: 238, g: 238, b: 210
 }
 
+LAST_MOVE_HIGHLIGHT_COLOR = {
+  r: 255, g: 255, b: 0, a: 100
+}
+
 HOVER_HIGHLIGHT_COLOR = {
   r: 0, g: 100, b: 100, a: 100
 }

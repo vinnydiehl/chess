@@ -2,7 +2,7 @@ class ChessGame
   def render_game
     render_background
     render_board
-    render_square_highlights unless @promotion || @result
+    render_square_highlights
     render_pieces
     render_captures_and_material
     render_notation
@@ -41,9 +41,24 @@ class ChessGame
   end
 
   def render_square_highlights
-    render_hover_highlight
-    render_legal_highlights
-    render_vision_highlights
+    render_last_move_highlight if @last_move_squares
+
+    unless @promotion || @result
+      render_hover_highlight
+      render_legal_highlights
+      render_vision_highlights
+    end
+  end
+
+  def render_last_move_highlight
+    @last_move_squares.each do |x, y|
+      @primitives << {
+        primitive_marker: :solid,
+        x: @x_offset + x * @square_size, y: y * @square_size,
+        w: @square_size, h: @square_size,
+        **LAST_MOVE_HIGHLIGHT_COLOR,
+      }
+    end
   end
 
   def render_hover_highlight
