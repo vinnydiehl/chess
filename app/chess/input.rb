@@ -26,7 +26,7 @@ class ChessGame
   # I'm adding this, but not all mouse inputs are included here.
   # Maybe needs a refactor...
   def process_mouse_inputs
-    if (direction = @mouse.wheel&.y)
+    if mouse_in_notation_box? && (direction = @mouse.wheel&.y)
       scroll = direction > 0 ? :up : :down
       case scroll
       when :up
