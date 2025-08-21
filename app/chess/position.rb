@@ -28,9 +28,21 @@ class ChessGame
     set_fen(pos[0])
     play_sound(pos[2])
     @last_move_squares = pos[3]
+
+    # Scroll notation box if the selected move goes outside of it
+    move = halfmove_to_move(n)
+    if move > NOTATION_MOVES_HEIGHT + @notation_box_position
+      @notation_box_position = move - NOTATION_MOVES_HEIGHT
+    elsif move <= @notation_box_position && @notation_box_position > 0
+      @notation_box_position = move - 1
+    end
   end
 
   def on_last_position?
     @current_position == @positions.size - 1
+  end
+
+  def halfmove_to_move(n)
+    ((n + 1) / 2).floor
   end
 end
