@@ -1,7 +1,7 @@
 SCENES = %w[game].freeze
 
 %w[constants castling check chess color_view colors
-   fen input mate material move notation piece
+   fen input mate material move notation piece position
    vision].each { |f| require "app/chess/#{f}.rb" }
 
 %w[scenes render].each { |dir| SCENES.each { |f| require "app/chess/#{dir}/#{f}.rb" } }

@@ -58,10 +58,20 @@ class ChessGame
     #   @en_passant_target
     #   @halfmove_count
     #   @move_count
-    set_fen(FEN)
+    load_fen(FEN)
 
-    # Keep track of all previous board positions for threefold repetition
-    @positions_seen = [position_record]
+    # @halfmove_count resets during a pawn push or capture, but
+    # this keeps a running total for keeping track of where in
+    # @positions we are.
+    @halfmove_total = 0
+
+    # Keep track of all previous board positions. Includes the
+    # starting position.
+    @positions = [position_entry]
+    # Game start sound for the first position
+    @positions[0][2] = :game_start
+    # Which position are we displaying?
+    @current_position = 0
 
     play_sound(:game_start)
   end

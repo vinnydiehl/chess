@@ -3,6 +3,8 @@ class ChessGame
     if mouse_on_board? && @mouse.key_down.left
       return if @result
 
+      return unless on_last_position?
+
       # Clicking on the pawn promotion picker
       if @promotion && (picker_pos = mouse_picker_pos)
         promotion_type = PROMOTION_PIECES[picker_pos]
@@ -151,32 +153,40 @@ class ChessGame
 
         # Increment move counters
         @move_count += 1 if piece_moved.color == :black
+        @halfmove_total += 1
         if piece_moved.type != :pawn && !capture
           @halfmove_count += 1
         else
           @halfmove_count = 0
         end
 
+        @last_move_squares = [@piece_original_pos, [x, y]]
+
+        @positions << position_entry
+        @current_position += 1
+
         checkmate = checkmate?(@color_to_move)
 
         # Draw situations
         if !checkmate
-          draw = false
-
           # Fifty-move rule
           draw = @halfmove_count >= 100
 
           # Threefold repetition rule
-          @positions_seen << position_record
-          draw ||= @positions_seen.tally.any? { |_, count| count >= 3 }
+          #
+          # Requirements: same board position, same color to move, and same
+          #               legal moves for each piece for 3 times is a draw.
+          #
+          # The first 2 elements of the FEN and the legal moves recorded
+          # gives us this information.
+          draw ||= @positions.map { |p| [p[0].split(" ")[0..1], p[1]] }
+                             .tally.any? { |_, count| count >= 3 }
 
           if draw
             @result = "½-½"
             sound = :game_end
           end
         end
-
-        @last_move_squares = [@piece_original_pos, [x, y]]
 
         @piece_original_pos = nil
 
@@ -189,7 +199,12 @@ class ChessGame
 
         auto_scroll_notation
 
-        play_sound(sound || :move_self)
+        sound ||= :move_self
+
+        # Set sound if we're creating a new position
+        @positions[-1][2] = sound if on_last_position?
+
+        play_sound(sound)
       else
         # Tried to drag a piece off the board, put it back
         @board[@piece_original_pos.x][@piece_original_pos.y] = @piece_held
@@ -199,18 +214,5 @@ class ChessGame
         play_sound(:illegal)
       end
     end
-  end
-
-  # Entry into @positions_seen, for threefold repetition rule
-  # Must have same board position, color to move, and legal moves to count
-  # for repetition, so this will account for en passant and castling
-  def position_record
-    [
-      get_position,
-      @color_to_move,
-      @board.each_with_index.map do |file, trx|
-        file.each_with_index.map { |p, try| p ? legal_moves(p, trx, try) : nil }
-      end,
-    ]
   end
 end

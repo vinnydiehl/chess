@@ -54,5 +54,13 @@ class ChessGame
     if @kb.key_down?(:space)
       @color_view = OTHER_COLOR[@color_view]
     end
+
+    if @kb.key_down?(:right)
+      set_current_position(@current_position + 1)
+    end
+
+    if @kb.key_down?(:left)
+      set_current_position(@current_position - 1)
+    end
   end
 end

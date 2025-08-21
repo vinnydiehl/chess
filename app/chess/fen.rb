@@ -36,7 +36,7 @@ FEN_KEY_SYM_TO_STR = {
 }
 
 class ChessGame
-  def set_fen(fen_string)
+  def load_fen(fen_string)
     fen = fen_string.split(" ")
 
     # Set the pieces on the board. x and y track which square we're looking at
@@ -47,8 +47,12 @@ class ChessGame
     ranks.each do |rank|
       rank.chars.each do |c|
         # If it's a number, put empty squares
-        if c == c.to_i.to_s
-          x += c.to_i
+        if c == (n = c.to_i).to_s
+          n.times do
+            @board[x][y] = nil
+            x += 1
+          end
+
           next
         end
 
