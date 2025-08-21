@@ -39,3 +39,7 @@ NOTATION_DARK_COLOR = {
 NOTATION_LIGHT_COLOR = {
   r: 100, g: 100, b: 100
 }
+
+CURRENT_MOVE_HIGHLIGHT_COLOR = {
+  r: 100, g: 0, b: 0, a: 50
+}

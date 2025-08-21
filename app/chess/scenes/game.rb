@@ -27,6 +27,8 @@ class ChessGame
       h: NOTATION_MOVES_HEIGHT * NOTATION_ROW_HEIGHT
     }
     @notation_box_position = 0
+    @notation_move_width = (@notation_box.w - NOTATION_MOVE_NUM_PADDING) / 2
+
     # Offset to center the legal move marker in the square
     @legal_center_offset = (@square_size / 2) - (@legal_marker_size / 2)
 

@@ -265,6 +265,23 @@ class ChessGame
       }
 
       line.each_with_index do |move, move_i|
+        # Draw current move highlight
+        if (@current_position / 2).ceil == turn_i + 1 && (@current_position - move_i).odd?
+          x = @notation_box.x + NOTATION_MOVE_NUM_PADDING - NOTATION_MOVE_HIGHLIGHT_PADDING
+          w = @notation_move_width
+          if move_i == 1
+            x += @notation_move_width
+            w += NOTATION_MOVE_HIGHLIGHT_PADDING
+          end
+
+          @primitives << {
+            primitive_marker: :solid,
+            x: x, y: y,
+            w: w, h: NOTATION_ROW_HEIGHT,
+            **CURRENT_MOVE_HIGHLIGHT_COLOR,
+          }
+        end
+
         # Draw move notation
         @primitives << {
           primitive_marker: :label,
