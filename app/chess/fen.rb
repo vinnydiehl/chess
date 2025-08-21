@@ -10,7 +10,7 @@ FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 # Move disambiguation testing
 # FEN = "8/3Q4/8/1Q3Q2/8/5Q2/5QQ1/Q7 w - - 0 1"
-# FEN = "8/8/3n3n/8/8/8/8/8 b - - 0 1"
+# FEN = "6k1/8/3n3n/8/8/8/8/1K6 b - - 0 1"
 
 # Pawn promotion testing
 # FEN = "2b5/PP1PPPpp/2P5/8/8/4p3/pppp1pPP/4N3 w - - 0 1"
@@ -68,6 +68,9 @@ class ChessGame
 
     # Whose turn is it?
     @color_to_move = { "w" => :white, "b" => :black }[fen[1]]
+
+    # Notation need to begin with an ellipsis if it's black to move
+    @notation << ["..."] if @color_to_move == :black
 
     set_castling_availability(fen[2])
 
