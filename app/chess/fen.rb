@@ -69,8 +69,9 @@ class ChessGame
     # Whose turn is it?
     @color_to_move = { "w" => :white, "b" => :black }[fen[1]]
 
-    # Notation need to begin with an ellipsis if it's black to move
-    @notation << ["..."] if @color_to_move == :black
+    # Notation need to begin with an ellipsis if
+    # loading a new board with black to move
+    @notation << ["..."] if @color_to_move == :black && @notation.empty?
 
     set_castling_availability(fen[2])
 
