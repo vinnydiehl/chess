@@ -1,5 +1,5 @@
 # Hardcoded starting position for now
-FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+# FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 # Test repeat moves w/ en passant
 # FEN = "6k1/8/8/8/6p1/8/5P2/6K1 w - - 0 1"
@@ -13,7 +13,7 @@ FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # FEN = "6k1/8/3n3n/8/8/8/8/1K6 b - - 0 1"
 
 # Pawn promotion testing
-# FEN = "2b5/PP1PPPpp/2P5/8/8/4p3/pppp1pPP/4N3 w - - 0 1"
+FEN = "2b4k/PP1PPPpp/2P5/8/8/4p3/pppp1pPP/4N2K w - - 0 1"
 
 # Fifty-move rule testing
 # FEN = "6k1/3R4/2R5/8/8/8/2K5/8 w - - 99 1"

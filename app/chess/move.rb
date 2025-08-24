@@ -17,7 +17,12 @@ class ChessGame
         append_notation(PIECE_NOTATION[promotion_type])
         notate_check_or_mate(@color_to_move)
 
-        play_sound(:promotion)
+        if (cm = checkmate?(@color_to_move)) || stalemate?(@color_to_move)
+          @result = cm ? (@color_to_move == :black ? "1-0" : "0-1") : "½-½"
+          play_sound(:game_end)
+        else
+          play_sound(:promotion)
+        end
       end
 
       # Otherwise, see if we're picking up a piece
