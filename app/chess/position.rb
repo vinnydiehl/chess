@@ -40,8 +40,10 @@ class ChessGame
     # If the game has resolved and we advance to the last move,
     # scroll to show the result
     if @result && @current_position == @positions.size - 1
-      @notation_box_position = halfmove_to_move(@current_position) + 1 -
-                               NOTATION_MOVES_HEIGHT
+      @notation_box_position = [
+        0,
+        halfmove_to_move(@current_position) + 1 - NOTATION_MOVES_HEIGHT,
+      ].max
     end
   end
 

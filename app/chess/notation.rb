@@ -156,4 +156,39 @@ class ChessGame
 
     { x: x, y: y, w: w, h: h }
   end
+
+  def mouse_pos_to_halfmove
+    # Leftmost x-coordinate where moves can be highlighted
+    moves_x = @notation_box.x + NOTATION_MOVE_NUM_PADDING - NOTATION_MOVE_HIGHLIGHT_PADDING
+
+    # nil if the mouse isn't in the notation box
+    if !mouse_in_notation_box? ||
+       @mouse.x < moves_x ||
+       @mouse.x > @notation_box.x + @notation_box.w
+      return
+    end
+
+    # 0..NOTATION_MOVES_HEIGHT from bottom to top
+    y_pos_in_box = ((@mouse.y - @notation_box.y) / NOTATION_ROW_HEIGHT).floor
+
+    move = NOTATION_MOVES_HEIGHT - y_pos_in_box + @notation_box_position
+
+    # nil if the mouse is over the result
+    if move >= @notation.size + 1
+      return
+    end
+
+    # Is the mouse over black's move?
+    right_side = @mouse.x > moves_x + @notation_move_width ? true : false
+
+    # nil if the mouse is over the right side and there's nothing there
+    if right_side && @notation[move - 1].size == 1
+      return
+    end
+
+    halfmove = move * 2
+    halfmove -= 1 unless right_side
+
+    halfmove
+  end
 end

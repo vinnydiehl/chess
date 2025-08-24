@@ -249,6 +249,15 @@ class ChessGame
       }
     end
 
+    # Draw move hover highlight
+    if (halfmove = mouse_pos_to_halfmove) && halfmove != @current_position
+      @primitives << {
+        primitive_marker: :solid,
+        **halfmove_to_notation_box_rect(halfmove),
+        **NOTATION_HOVER_HIGHLIGHT_COLOR,
+      }
+    end
+
     notation_to_draw.each_with_index do |line, turn_i|
       y = @notation_y_top - (NOTATION_ROW_HEIGHT * (turn_i + 1))
 
