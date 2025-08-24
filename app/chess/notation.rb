@@ -139,4 +139,21 @@ class ChessGame
     # The result isn't part of @notation but needs to be displayed
     @notation.size + (@result ? 1 : 0)
   end
+
+  def halfmove_to_notation_box_rect(n)
+    return if n < 1
+
+    x = @notation_box.x + NOTATION_MOVE_NUM_PADDING - NOTATION_MOVE_HIGHLIGHT_PADDING
+    y = @notation_y_top - (NOTATION_ROW_HEIGHT * (n / 2).ceil) +
+        (@notation_box_position * NOTATION_ROW_HEIGHT)
+    w = @notation_move_width
+    h = NOTATION_ROW_HEIGHT
+
+    if n.even?
+      x += @notation_move_width
+      w += NOTATION_MOVE_HIGHLIGHT_PADDING
+    end
+
+    { x: x, y: y, w: w, h: h }
+  end
 end

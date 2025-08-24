@@ -224,8 +224,10 @@ class ChessGame
     # If there's a result, we'll just throw it onto the end
     notation << @result if @result
 
-    notation[@notation_box_position...(NOTATION_MOVES_HEIGHT + @notation_box_position)]
-      .each_with_index do |line, turn_i|
+    notation_to_draw =
+      notation[@notation_box_position...(NOTATION_MOVES_HEIGHT + @notation_box_position)]
+
+    notation_to_draw.each_with_index do |line, turn_i|
       y = @notation_y_top - (NOTATION_ROW_HEIGHT * (turn_i + 1))
 
       # Draw row
@@ -235,6 +237,20 @@ class ChessGame
         w: @notation_box.w, h: NOTATION_ROW_HEIGHT,
         **(turn_i.even? ? NOTATION_DARK_COLOR : NOTATION_LIGHT_COLOR),
       }
+    end
+
+    # Draw current move highlight
+    if (current_move_rect = halfmove_to_notation_box_rect(@current_position)) &&
+       (@current_position / 2).ceil <= NOTATION_MOVES_HEIGHT + @notation_box_position
+      @primitives << {
+        primitive_marker: :solid,
+        **current_move_rect,
+        **CURRENT_MOVE_HIGHLIGHT_COLOR,
+      }
+    end
+
+    notation_to_draw.each_with_index do |line, turn_i|
+      y = @notation_y_top - (NOTATION_ROW_HEIGHT * (turn_i + 1))
 
       # Draw result
       if @result && line == @result
@@ -265,24 +281,6 @@ class ChessGame
       }
 
       line.each_with_index do |move, move_i|
-        # Draw current move highlight
-        if (@current_position / 2).ceil - @notation_box_position == turn_i + 1 &&
-           (@current_position - move_i).odd?
-          x = @notation_box.x + NOTATION_MOVE_NUM_PADDING - NOTATION_MOVE_HIGHLIGHT_PADDING
-          w = @notation_move_width
-          if move_i == 1
-            x += @notation_move_width
-            w += NOTATION_MOVE_HIGHLIGHT_PADDING
-          end
-
-          @primitives << {
-            primitive_marker: :solid,
-            x: x, y: y,
-            w: w, h: NOTATION_ROW_HEIGHT,
-            **CURRENT_MOVE_HIGHLIGHT_COLOR,
-          }
-        end
-
         # Draw move notation
         @primitives << {
           primitive_marker: :label,
