@@ -17,10 +17,17 @@ class ChessGame
         append_notation(PIECE_NOTATION[promotion_type])
         notate_check_or_mate(@color_to_move)
 
+        # Need to update the last board position to include this promotion
+        @positions[-1][0] = get_fen
+
         if (cm = checkmate?(@color_to_move)) || stalemate?(@color_to_move)
           @result = cm ? (@color_to_move == :black ? "1-0" : "0-1") : "½-½"
+
+          # Play sound and update sound for last board position
+          @positions[-1][2] = :game_end
           play_sound(:game_end)
         else
+          @positions[-1][2] = :promotion
           play_sound(:promotion)
         end
       end
