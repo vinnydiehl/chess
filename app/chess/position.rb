@@ -36,6 +36,13 @@ class ChessGame
     elsif move <= @notation_box_position && @notation_box_position > 0
       @notation_box_position = move - 1
     end
+
+    # If the game has resolved and we advance to the last move,
+    # scroll to show the result
+    if @result && @current_position == @positions.size - 1
+      @notation_box_position = halfmove_to_move(@current_position) + 1 -
+                               NOTATION_MOVES_HEIGHT
+    end
   end
 
   def on_last_position?
