@@ -25,7 +25,7 @@ class ChessGame
     @current_position = n
     pos = @positions[n]
 
-    set_fen(pos[0])
+    load_fen(pos[0])
     play_sound(pos[2])
     @last_move_squares = pos[3]
 
