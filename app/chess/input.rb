@@ -26,15 +26,21 @@ class ChessGame
   # I'm adding this, but not all mouse inputs are included here.
   # Maybe needs a refactor...
   def process_mouse_inputs
-    if mouse_in_notation_box? && (direction = @mouse.wheel&.y)
-      scroll = direction > 0 ? :up : :down
-      case scroll
-      when :up
-        @notation_box_position -= 1 if @notation_box_position > 0
-      when :down
-        if @notation_box_position < notation_box_row_count - NOTATION_MOVES_HEIGHT
-          @notation_box_position += 1
+    if mouse_in_notation_box?
+      if (direction = @mouse.wheel&.y)
+        scroll = direction > 0 ? :up : :down
+        case scroll
+        when :up
+          @notation_box_position -= 1 if @notation_box_position > 0
+        when :down
+          if @notation_box_position < notation_box_row_count - NOTATION_MOVES_HEIGHT
+            @notation_box_position += 1
+          end
         end
+      end
+
+      if @mouse.key_down.left && (halfmove = mouse_pos_to_halfmove)
+        set_current_position(halfmove)
       end
     end
   end
