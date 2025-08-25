@@ -7,8 +7,16 @@ PIECE_NOTATION = {
 }
 
 class ChessGame
+  def rank_notation_to_square(char)
+    char.to_i - 1
+  end
+
+  def file_notation_to_square(char)
+    char.ord - 97
+  end
+
   def notation_to_square(str)
-    [str[0].ord - 97, str[1].to_i - 1]
+    [file_notation_to_square(str[0]), rank_notation_to_square(str[1])]
   end
 
   def file_notation(x)
@@ -55,7 +63,7 @@ class ChessGame
       piece_moved += file_notation(origin[0]) if capture
     elsif piece.type == :king && (offset = x - ox).abs == 2
       # Castling
-      add_notation_segment(offset < 0 ? "0-0-0" : "0-0")
+      add_notation_segment(offset < 0 ? "O-O-O" : "O-O")
       return
     else
       piece_moved += PIECE_NOTATION[piece.type]

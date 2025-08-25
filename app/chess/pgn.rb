@@ -12,7 +12,7 @@ PGN = <<EOS
 [Result "1/2-1/2"]
 
 1.e4 e5 2.Nf3 Nc6 3.Bb5 {This opening is called the "Ruy Lopez".} 3...a6
-4.Ba4 Nf6 5.O-O Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3 Nb8 10.d4 Nbd7
+4.Ba4 Nf6 5.0-0 Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3 Nb8 10.d4 Nbd7
 11.c4 c6 12.cxb5 axb5 13.Nc3 Bb7 14.Bg5 b4 ; Line comment "test"!!!
 15.Nb1 h6 16.Bh4 c5 17.dxe5 $242
 Nxe4 18.Bxe7 Qxe7 19.exd6 Qf6 20.Nbd2 Nxd6 21.Nc4 Nxc4 22.Bxc4 Nb6
@@ -27,6 +27,14 @@ NUMERIC = ("0".."9").to_a.join("")
 ALPHANUMERIC = ALPHA + NUMERIC
 WHITESPACE = " \n\t"
 SYMBOL = ALPHANUMERIC + "_+#=:-/"
+
+NOTATION_STR_TO_SYM = {
+  "N" => :knight,
+  "B" => :bishop,
+  "R" => :rook,
+  "Q" => :queen,
+  "K" => :king,
+}
 
 class PGNError < StandardError
 end
@@ -178,7 +186,9 @@ class ChessGame
     # Parse movetext
     until tokens.size == 1
       token = tokens.shift
-      if NUMERIC.include?(token[0])
+
+      # The "-" check is to handle castling notated with 0-0 rather than O-O
+      if NUMERIC.include?(token[0]) && token[1] != "-"
         if @move_count != token.to_i
           raise PGNError.new(
             "PGN: Invalid move number: #{token} (should be #{@move_count})"
@@ -197,8 +207,16 @@ class ChessGame
         next
       elsif token == "."
         next
-      elsif ALPHA.include?(token[0])
+      elsif ALPHA.include?(token[0]) || token[0..1] == "0-"
         # We've encountered a move
+
+        # Fix improper castling notation (it should be O not 0)
+        if token == "0-0"
+          token = "O-O"
+        elsif token == "0-0-0"
+          token = "O-O-O"
+        end
+
         if @notation[-1]&.size == 1
           # Black's move
           @notation[-1] << token
@@ -207,6 +225,9 @@ class ChessGame
           # White's move
           @notation << [token]
         end
+
+        move = parse_move_notation(token)
+        p move
 
         @color_to_move = OTHER_COLOR[@color_to_move]
         @halfmove_total += 1
@@ -223,5 +244,80 @@ class ChessGame
     @result = tokens[0] == "*" ? nil : tokens[0]
     # Prettify draw result
     @result = "½-½" if @result == "1/2-1/2"
+  end
+
+  def parse_move_notation(str)
+    color = @color_to_move
+
+    # Castling is a special case, handle it right away
+    if ["0-0", "O-O"].include?(str.upcase)
+      return { color: color, castle: :kingside }
+    elsif ["0-0-0", "O-O-O"].include?(str.upcase)
+      return { color: color, castle: :queenside }
+    end
+
+    # Clone the input so we don't destroy it
+    str = str.clone
+
+    # If it's a capture, record that fact and remove the x
+    capture = str.include?("x")
+    str.gsub!("x", "") if capture
+
+    # Check/checkmate
+    check, checkmate = false, false
+    if str[-1] == "+"
+      check = true
+      str.chop!
+    elsif str[-1] == "#"
+      checkmate = true
+      str.chop!
+    end
+
+    # Determine piece type
+    type = :pawn
+    if str[0] == str[0].upcase
+      type = NOTATION_STR_TO_SYM[str[0]]
+      str.slice!(0)
+    end
+
+    # Pawn promotion
+    promotion = nil
+    if type == :pawn
+      # Handle notation like e8(Q)
+      str.chop! if str[-1] == ")"
+
+      if ALPHA.include?(str[-1])
+        promotion = NOTATION_STR_TO_SYM[str[-1].upcase]
+        str.chop!
+        # There might be leading symbol, remove it
+        str.chop! if "=/(".include?(str[-1])
+      end
+    end
+
+    # Target square
+    square = notation_to_square(str.slice!(-2, 2))
+
+    # All that's left should be move disambiguation, if anything
+    disambiguation_x, disambiguation_y = nil, nil
+    until str.empty?
+      c = str.slice!(0)
+      if ALPHA.include?(c)
+        disambiguation_y = file_notation_to_square(c)
+      elsif NUMERIC.include?(c)
+        disambiguation_x = rank_notation_to_square(c)
+      end
+    end
+
+    {
+      color: color,
+      type: type,
+      square: square,
+      capture: capture,
+      disambiguation_x: disambiguation_x,
+      disambiguation_y: disambiguation_y,
+      promotion: promotion,
+      check: check,
+      checkmate: checkmate,
+    }
   end
 end
