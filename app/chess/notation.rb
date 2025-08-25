@@ -161,10 +161,8 @@ class ChessGame
     # Leftmost x-coordinate where moves can be highlighted
     moves_x = @notation_box.x + NOTATION_MOVE_NUM_PADDING - NOTATION_MOVE_HIGHLIGHT_PADDING
 
-    # nil if the mouse isn't in the notation box
-    if !mouse_in_notation_box? ||
-       @mouse.x < moves_x ||
-       @mouse.x > @notation_box.x + @notation_box.w
+    # nil if the mouse isn't in the notation box and over the moves (not the move numbers)
+    if !mouse_in_notation_box? || @mouse.x < moves_x
       return
     end
 
