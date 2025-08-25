@@ -76,6 +76,9 @@ class ChessGame
     @current_position = 0
 
     play_sound(:game_start)
+
+    # PGN testing
+    tokenize_pgn(PGN)
   end
 
   def game_tick
