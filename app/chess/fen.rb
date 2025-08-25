@@ -1,5 +1,7 @@
+START_POS_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
 # Hardcoded starting position for now
-FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+FEN = START_POS_FEN
 
 # Test repeat moves w/ en passant
 # FEN = "6k1/8/8/8/6p1/8/5P2/6K1 w - - 0 1"

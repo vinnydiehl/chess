@@ -7,7 +7,7 @@ PGN = <<EOS
 [Site "Belgrade, \\"Serbia\\" JUG"]
 [Date "1992.11.04"]
 [Round "29"]
-[White "Fischer, Robert J.":"P2"]
+[White "Fischer, Robert J."]
 [Black "Spassky, Boris V."]
 [Result "1/2-1/2"]
 
@@ -27,6 +27,9 @@ NUMERIC = ("0".."9").to_a.join("")
 ALPHANUMERIC = ALPHA + NUMERIC
 WHITESPACE = " \n\t"
 SYMBOL = ALPHANUMERIC + "_+#=:-/"
+
+class PGNError < StandardError
+end
 
 class ChessGame
   def tokenize_pgn(str)
@@ -115,7 +118,7 @@ class ChessGame
       end
 
       # Self-terminating tokens
-      if current.empty? && ".*:[]()<>".include?(c)
+      if current.empty? && ".*[]()<>".include?(c)
         tokens << c
         next
       end
@@ -152,9 +155,73 @@ class ChessGame
     end
 
     # Testing
-    puts "\n#{str}\n---\n"
-    p tokens
+    puts "\n---\nTest PGN:\n\n#{str}\n---\nToken Array:\n\n#{tokens}"
 
     tokens
+  end
+
+  def import_pgn(str)
+    reset_game
+
+    tokens = tokenize_pgn(str)
+
+    # Parse tag pairs. We're not doing anything with these currently,
+    # but at least we have them.
+    tags = []
+    while tokens.shift == "["
+      tags << { symbol: tokens.shift, string: tokens.shift }
+      if tokens.shift != "]"
+        raise PGNError.new("PGN: Invalid tag pair.")
+      end
+    end
+
+    # Parse movetext
+    until tokens.size == 1
+      token = tokens.shift
+      if NUMERIC.include?(token[0])
+        if @move_count != token.to_i
+          raise PGNError.new(
+            "PGN: Invalid move number: #{token} (should be #{@move_count})"
+          )
+        end
+      elsif token == "{"
+        # Ignore commentary
+        until tokens.shift == "}"
+          next
+        end
+      elsif token == ";"
+        # If line commentary, ignore the next token (the commentary string)
+        tokens.shift
+      elsif token[0] == "$"
+        # TODO: Implement NAG, we're skipping these for now
+        next
+      elsif token == "."
+        next
+      elsif ALPHA.include?(token[0])
+        # We've encountered a move
+        if @notation[-1]&.size == 1
+          # Black's move
+          @notation[-1] << token
+          @move_count += 1
+        else
+          # White's move
+          @notation << [token]
+        end
+
+        @color_to_move = OTHER_COLOR[@color_to_move]
+        @halfmove_total += 1
+      else
+        raise PGNError.new("PGN: Invalid token in movetext: #{token}")
+      end
+    end
+
+    # If last token is "*" game is still in progress, otherwise
+    # that's the result
+    unless ["*", "1-0", "0-1", "1/2-1/2"].include?(tokens[0])
+      raise PGNError.new("PGN: Invalid result.")
+    end
+    @result = tokens[0] == "*" ? nil : tokens[0]
+    # Prettify draw result
+    @result = "½-½" if @result == "1/2-1/2"
   end
 end

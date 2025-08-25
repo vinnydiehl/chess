@@ -33,6 +33,13 @@ class ChessGame
     @legal_center_offset = (@square_size / 2) - (@legal_marker_size / 2)
 
     @board = Array.new(8) { Array.new(8, nil) }
+    reset_game(FEN)
+
+    # PGN testing
+    import_pgn(PGN)
+  end
+
+  def reset_game(fen = START_POS_FEN)
     @notation = []
     @result = nil
 
@@ -60,7 +67,7 @@ class ChessGame
     #   @en_passant_target
     #   @halfmove_count
     #   @move_count
-    load_fen(FEN)
+    load_fen(fen)
 
     # @halfmove_count resets during a pawn push or capture, but
     # this keeps a running total for keeping track of where in
@@ -72,13 +79,11 @@ class ChessGame
     @positions = [position_entry]
     # Game start sound for the first position
     @positions[0][2] = :game_start
+
     # Which position are we displaying?
     @current_position = 0
 
     play_sound(:game_start)
-
-    # PGN testing
-    tokenize_pgn(PGN)
   end
 
   def game_tick
