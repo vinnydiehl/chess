@@ -91,14 +91,14 @@ class ChessGame
   end
 
   def board_deep_copy(board = @board)
-    temp = []
-
-    board.each do |file|
-      tf = []
-      file.each { |piece| tf << piece }
-      temp << tf
+    board.map do |file|
+      file.map { |piece| piece }
     end
+  end
 
-    temp
+  def hash_deep_copy(hash)
+    hash.each_key.map do |key|
+      [key, hash[key].clone]
+    end.to_h
   end
 end

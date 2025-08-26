@@ -263,8 +263,8 @@ class ChessGame
 
     # We've been using @board to load the PGN, so set the position to
     # the starting position
-    load_fen(START_POS_FEN)
-    @last_move_squares = nil
+    p @positions
+    set_current_position(0)
   end
 
   def parse_move_notation(str)
@@ -400,6 +400,9 @@ class ChessGame
         tx, ty = move[:square][0], move[:square][1]
         next unless legal_moves(piece, x, y).include?([tx, ty])
 
+        # Record capture (will be nil if there's nothing there)
+        capture = @board[tx][ty]
+
         @board[x][y] = nil
         @board[tx][ty] = piece
         @last_move_squares = [[x, y], [tx, ty]]
@@ -429,8 +432,10 @@ class ChessGame
           @en_passant_target = nil
         end
 
+        @captures[move[:color]] << capture if capture
+
         # Set appropriate sound (ordered for precedence)
-        sound = move[:capture] ? :capture : :move_self
+        sound = capture ? :capture : :move_self
         sound = :promotion if move[:promotion]
         sound = :move_check if move[:check]
 

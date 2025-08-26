@@ -12,6 +12,7 @@ class ChessGame
       sound: sound,
       # Starting/finishing squares for the move before this one (for highlighting)
       last_move: @last_move_squares,
+      captures: hash_deep_copy(@captures),
     }
   end
 
@@ -28,6 +29,7 @@ class ChessGame
     load_fen(pos[:fen])
     play_sound(pos[:sound])
     @last_move_squares = pos[:last_move]
+    @captures = pos[:captures]
 
     # Scroll notation box if the selected move goes outside of it
     move = halfmove_to_move(n)
