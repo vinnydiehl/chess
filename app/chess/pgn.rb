@@ -33,6 +33,7 @@ PGN = <<EOS
 [WhiteELO "?"]
 [BlackELO "?"]
 
+% Ignore this line
 1. e4 c6 2. e5 f5 3. exf6 g6 4. f3 e6 5. g3 d6 6. d3 Kd7 7. f7 Na6 8. fxg8=Q *
 EOS
 
@@ -55,6 +56,9 @@ end
 
 class ChessGame
   def tokenize_pgn(str)
+    # Remove lines escaped with a % at the beginning
+    str = str.lines.reject { |line| line.start_with?("%") }.join
+
     tokens = []
 
     current = ""
