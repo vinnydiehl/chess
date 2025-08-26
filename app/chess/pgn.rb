@@ -33,8 +33,7 @@ PGN = <<EOS
 [WhiteELO "?"]
 [BlackELO "?"]
 
-% Ignore this line
-1. e4 c6 2. e5 f5 3. exf6 g6 4. f3 e6 5. g3 d6 6. d3 Kd7 7. f7 Na6 8. fxg8=Q *
+1. g3 b6 2. Bg2 Bb7 3. Nf3 Nc6 4. Kf1 Rb8 *
 EOS
 
 ALPHA = (("A".."Z").to_a + ("a".."z").to_a).join("")
@@ -263,7 +262,6 @@ class ChessGame
 
     # We've been using @board to load the PGN, so set the position to
     # the starting position
-    p @positions
     set_current_position(0)
   end
 
@@ -374,6 +372,10 @@ class ChessGame
       @board[rook_x][y] = nil
       @board[rook_target_x][y] = Piece.new(move[:color], :rook)
 
+      # No more castling
+      instance_variable_set("@#{move[:color]}_can_castle_kingside", false)
+      instance_variable_set("@#{move[:color]}_can_castle_queenside", false)
+
       @color_to_move = OTHER_COLOR[@color_to_move]
       # Increment move counters
       @move_count += 1 if move[:color] == :black
@@ -406,6 +408,17 @@ class ChessGame
         @board[x][y] = nil
         @board[tx][ty] = piece
         @last_move_squares = [[x, y], [tx, ty]]
+
+        # Castling availability
+        if piece.type == :king
+          # Moving the king means no more castling for that color
+          instance_variable_set("@#{move[:color]}_can_castle_kingside", false)
+          instance_variable_set("@#{move[:color]}_can_castle_queenside", false)
+        end
+        if piece.type == :rook && [0, 7].include?(x)
+          side_affected = { 0 => :queenside, 7 => :kingside }[x]
+          instance_variable_set("@#{move[:color]}_can_castle_#{side_affected}", false)
+        end
 
         if piece.type == :pawn
           # En passant
