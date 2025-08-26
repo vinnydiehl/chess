@@ -327,6 +327,7 @@ class ChessGame
   # from the move notation, and inserts an entry into @positions.
   #
   # `move` contains the following keys:
+  #  * san
   #  * color
   #  * type
   #  * square
