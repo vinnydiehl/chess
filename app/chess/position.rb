@@ -1,18 +1,18 @@
 class ChessGame
   # Entry into @positions
-  def position_entry
-    [
-      # 0: FEN
-      get_fen,
-      # 1: Legal moves for every piece on the board (for threefold repetition)
-      @board.each_with_index.map do |file, trx|
+  def position_entry(sound = nil)
+    {
+      # FEN
+      fen: get_fen,
+      # Legal moves for every piece on the board (for threefold repetition)
+      legal_moves: @board.each_with_index.map do |file, trx|
         file.each_with_index.map { |p, try| p ? legal_moves(p, trx, try) : nil }
       end,
-      # 2: Sound played for this move
-      nil,
-      # 3: Starting/finishing squares for the move before this one (for highlighting)
-      @last_move_squares,
-    ]
+      # Sound played for this move
+      sound: sound,
+      # Starting/finishing squares for the move before this one (for highlighting)
+      last_move: @last_move_squares,
+    }
   end
 
   def set_current_position(n)
@@ -25,9 +25,9 @@ class ChessGame
     @current_position = n
     pos = @positions[n]
 
-    load_fen(pos[0])
-    play_sound(pos[2])
-    @last_move_squares = pos[3]
+    load_fen(pos[:fen])
+    play_sound(pos[:sound])
+    @last_move_squares = pos[:last_move]
 
     # Scroll notation box if the selected move goes outside of it
     move = halfmove_to_move(n)

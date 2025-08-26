@@ -18,16 +18,16 @@ class ChessGame
         notate_check_or_mate(@color_to_move)
 
         # Need to update the last board position to include this promotion
-        @positions[-1][0] = get_fen
+        @positions[-1][:fen] = get_fen
 
         if (cm = checkmate?(@color_to_move)) || stalemate?(@color_to_move)
           @result = cm ? (@color_to_move == :black ? "1-0" : "0-1") : "½-½"
 
           # Play sound and update sound for last board position
-          @positions[-1][2] = :game_end
+          @positions[-1][:sound] = :game_end
           play_sound(:game_end)
         else
-          @positions[-1][2] = :promotion
+          @positions[-1][:sound] = :promotion
           play_sound(:promotion)
         end
       end
@@ -191,7 +191,7 @@ class ChessGame
           #
           # The first 2 elements of the FEN and the legal moves recorded
           # gives us this information.
-          draw ||= @positions.map { |p| [p[0].split(" ")[0..1], p[1]] }
+          draw ||= @positions.map { |p| [p[:fen].split(" ")[0..1], p[:legal_moves]] }
                              .tally.any? { |_, count| count >= 3 }
 
           if draw
@@ -214,7 +214,7 @@ class ChessGame
         sound ||= :move_self
 
         # Set sound if we're creating a new position
-        @positions[-1][2] = sound if on_last_position?
+        @positions[-1][:sound] = sound if on_last_position?
 
         play_sound(sound)
       else

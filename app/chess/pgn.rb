@@ -2,24 +2,38 @@
 # Specification: https://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 
 # Test PGN
-PGN = <<EOS
-[Event "F\\\\S Return Match"]
-[Site "Belgrade, \\"Serbia\\" JUG"]
-[Date "1992.11.04"]
-[Round "29"]
-[White "Fischer, Robert J."]
-[Black "Spassky, Boris V."]
-[Result "1/2-1/2"]
+# PGN = <<EOS
+# [Event "F\\\\S Return Match"]
+# [Site "Belgrade, \\"Serbia\\" JUG"]
+# [Date "1992.11.04"]
+# [Round "29"]
+# [White "Fischer, Robert J."]
+# [Black "Spassky, Boris V."]
+# [Result "1/2-1/2"]
+#
+# 1.e4 e5 2.Nf3 Nc6 3.Bb5 {This opening is called the "Ruy Lopez".} 3...a6
+# 4.Ba4 Nf6 5.0-0 Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3 Nb8 10.d4 Nbd7
+# 11.c4 c6 12.cxb5 axb5 13.Nc3 Bb7 14.Bg5 b4 ; Line comment "test"!!!
+# 15.Nb1 h6 16.Bh4 c5 17.dxe5 $242
+# Nxe4 18.Bxe7 Qxe7 19.exd6 Qf6 20.Nbd2 Nxd6 21.Nc4 Nxc4 22.Bxc4 Nb6
+# 23.Ne5 Rae8 24.Bxf7+ Rxf7 25.Nxf7 Rxe1+ 26.Qxe1 Kxf7 27.Qe3 Qg5 28.Qxg5
+# hxg5 29.b3 Ke6 30.a3 Kd6 31.axb4 cxb4 32.Ra5 Nd5 33.f3 Bc8 34.Kf2 Bf5
+# 35.Ra7 g6 36.Ra6+ Kc5 37.Ke1 Nf4 38.g3 Nxh3 39.Kd2 Kb5 40.Rd6 Kc5 41.Ra6
+# Nf2 42.g4 Bd3 43.Re6 1/2-1/2
+# EOS
 
-1.e4 e5 2.Nf3 Nc6 3.Bb5 {This opening is called the "Ruy Lopez".} 3...a6
-4.Ba4 Nf6 5.0-0 Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3 Nb8 10.d4 Nbd7
-11.c4 c6 12.cxb5 axb5 13.Nc3 Bb7 14.Bg5 b4 ; Line comment "test"!!!
-15.Nb1 h6 16.Bh4 c5 17.dxe5 $242
-Nxe4 18.Bxe7 Qxe7 19.exd6 Qf6 20.Nbd2 Nxd6 21.Nc4 Nxc4 22.Bxc4 Nb6
-23.Ne5 Rae8 24.Bxf7+ Rxf7 25.Nxf7 Rxe1+ 26.Qxe1 Kxf7 27.Qe3 Qg5 28.Qxg5
-hxg5 29.b3 Ke6 30.a3 Kd6 31.axb4 cxb4 32.Ra5 Nd5 33.f3 Bc8 34.Kf2 Bf5
-35.Ra7 g6 36.Ra6+ Kc5 37.Ke1 Nf4 38.g3 Nxh3 39.Kd2 Kb5 40.Rd6 Kc5 41.Ra6
-Nf2 42.g4 Bd3 43.Re6 1/2-1/2
+PGN = <<EOS
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[WhiteELO "?"]
+[BlackELO "?"]
+
+1. e4 c6 2. e5 f5 3. exf6 g6 4. f3 e6 5. g3 d6 6. d3 Kd7 7. f7 Na6 8. fxg8=Q *
 EOS
 
 ALPHA = (("A".."Z").to_a + ("a".."z").to_a).join("")
@@ -220,17 +234,12 @@ class ChessGame
         if @notation[-1]&.size == 1
           # Black's move
           @notation[-1] << token
-          @move_count += 1
         else
           # White's move
           @notation << [token]
         end
 
-        move = parse_move_notation(token)
-        p move
-
-        @color_to_move = OTHER_COLOR[@color_to_move]
-        @halfmove_total += 1
+        add_move_to_positions(parse_move_notation(token))
       else
         raise PGNError.new("PGN: Invalid token in movetext: #{token}")
       end
@@ -244,9 +253,18 @@ class ChessGame
     @result = tokens[0] == "*" ? nil : tokens[0]
     # Prettify draw result
     @result = "½-½" if @result == "1/2-1/2"
+
+    # If there's a result, need to set the sound for the last position
+    @positions[-1][:sound] = :game_end if @result
+
+    # We've been using @board to load the PGN, so set the position to
+    # the starting position
+    load_fen(START_POS_FEN)
+    @last_move_squares = nil
   end
 
   def parse_move_notation(str)
+    original_str = str
     color = @color_to_move
 
     # Castling is a special case, handle it right away
@@ -309,6 +327,7 @@ class ChessGame
     end
 
     {
+      san: original_str,
       color: color,
       type: type,
       square: square,
@@ -319,5 +338,115 @@ class ChessGame
       check: check,
       checkmate: checkmate,
     }
+  end
+
+  # Takes a Hash `move` containing all of the data that can be gleaned
+  # from the move notation, and inserts an entry into @positions.
+  #
+  # `move` contains the following keys:
+  #  * color
+  #  * type
+  #  * square
+  #  * capture
+  #  * disambiguation_x
+  #  * disambiguation_y
+  #  * promotion
+  #  * check
+  #  * checkmate
+  def add_move_to_positions(move)
+    # Handle castling right away
+    if (castle = move[:castle])
+      y = move[:color] == :white ? 0 : 7
+      rook_x = castle == :kingside ? 7 : 0
+      king_target_x = castle == :kingside ? 6 : 2
+      rook_target_x = castle == :kingside ? 5 : 3
+
+      @last_move_squares = [[4, y], [king_target_x, y]]
+
+      # Move king
+      @board[4][y] = nil
+      @board[king_target_x][y] = Piece.new(move[:color], :king)
+      # Move rook
+      @board[rook_x][y] = nil
+      @board[rook_target_x][y] = Piece.new(move[:color], :rook)
+
+      @color_to_move = OTHER_COLOR[@color_to_move]
+      # Increment move counters
+      @move_count += 1 if move[:color] == :black
+      @halfmove_count += 1
+      @halfmove_total += 1
+
+      @positions << position_entry(:castle)
+
+      return
+    end
+
+    @board.each_with_index do |file, x|
+      next if move[:disambiguation_y] && move[:disambiguation_y] != x
+
+      file.each_with_index do |piece, y|
+        next if move[:disambiguation_x] && move[:disambiguation_x] != y
+
+        # Filtering for piece of the proper color and type
+        next if piece&.color != move[:color] || piece&.type != move[:type]
+
+        # If we've reached this point, we've found a hopefully properly
+        # disambiguated piece to move, so check if the piece can legally
+        # move there
+        tx, ty = move[:square][0], move[:square][1]
+        next unless legal_moves(piece, x, y).include?([tx, ty])
+
+        @board[x][y] = nil
+        @board[tx][ty] = piece
+        @last_move_squares = [[x, y], [tx, ty]]
+
+        if piece.type == :pawn
+          # En passant
+          ep_y = piece.color == :white ? ty - 1 : ty + 1
+
+          # Set en passant target
+          if (y - ty).abs == 2
+            @en_passant_target = [tx, ep_y]
+          else
+            # Capture
+            if [tx, ty] == @en_passant_target
+              capture = @board[tx][ep_y]
+              @board[tx][ep_y] = nil
+            end
+
+            @en_passant_target = nil
+          end
+
+          # Pawn promotion
+          if move[:promotion]
+            @board[tx][ty] = Piece.new(move[:color], move[:promotion])
+          end
+        else
+          @en_passant_target = nil
+        end
+
+        # Set appropriate sound (ordered for precedence)
+        sound = move[:capture] ? :capture : :move_self
+        sound = :promotion if move[:promotion]
+        sound = :move_check if move[:check]
+
+        @color_to_move = OTHER_COLOR[@color_to_move]
+        # Increment move counters
+        @move_count += 1 if move[:color] == :black
+        if move[:type] != :pawn && !move[:capture]
+          @halfmove_count += 1
+        else
+          @halfmove_count = 0
+        end
+        @halfmove_total += 1
+
+        @positions << position_entry(sound)
+
+        return
+      end
+    end
+
+    dots = @color_to_move == :white ? "." : "..."
+    raise PGNError.new("Unable to make move: #{@move_count}#{dots} #{move[:san]}")
   end
 end

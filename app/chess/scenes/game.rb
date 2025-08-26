@@ -76,9 +76,7 @@ class ChessGame
 
     # Keep track of all previous board positions. Includes the
     # starting position.
-    @positions = [position_entry]
-    # Game start sound for the first position
-    @positions[0][2] = :game_start
+    @positions = [position_entry(:game_start)]
 
     # Which position are we displaying?
     @current_position = 0
