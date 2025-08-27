@@ -171,11 +171,12 @@ class ChessGame
 
     tokens = tokenize_pgn(str)
 
-    # Parse tag pairs. We're not doing anything with these currently,
-    # but at least we have them.
-    tags = []
+    # Parse tag pairs
     while tokens.shift == "["
-      tags << { symbol: tokens.shift, string: tokens.shift }
+      symbol = tokens.shift
+      @tags[camel_to_snake(symbol).to_sym] = tokens.shift
+
+      # There should only be 2 tokens inside the tag
       if tokens.shift != "]"
         raise PGNError.new("PGN: Invalid tag pair.")
       end
@@ -452,5 +453,16 @@ class ChessGame
 
     dots = @color_to_move == :white ? "." : "..."
     raise PGNError.new("Unable to make move: #{@move_count}#{dots} #{move[:san]}")
+  end
+
+  # Convert CamelCase to snake_case
+  def camel_to_snake(str)
+    str.chars.map.with_index do |char, i|
+      if i > 0 && char.upcase == char && char.downcase != char
+        "_#{char.downcase}"
+      else
+        char.downcase
+      end
+    end.join
   end
 end

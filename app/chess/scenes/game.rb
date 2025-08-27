@@ -40,6 +40,7 @@ class ChessGame
   end
 
   def reset_game(fen = START_POS_FEN)
+    @tags = {}
     @notation = []
     @result = nil
 
