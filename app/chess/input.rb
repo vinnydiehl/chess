@@ -53,6 +53,10 @@ class ChessGame
       puts get_fen
     end
 
+    if @kb.key_down?(:p)
+      puts "\n#{export_pgn}"
+    end
+
     if @kb.key_down?(:n)
       print_notation
     end

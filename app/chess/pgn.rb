@@ -7,9 +7,11 @@ PGN = <<EOS
 [Site "Belgrade, \\"Serbia\\" JUG"]
 [Date "1992.11.04"]
 [Round "29"]
-[White "Fischer, Robert J."]
+%[White "Fischer, Robert J."]
 [Black "Spassky, Boris V."]
 [Result "1/2-1/2"]
+[WhiteElo "2400"]
+[BlackElo "2300"]
 
 1.e4 e5 2.Nf3 Nc6 3.Bb5 {This opening is called the "Ruy Lopez".} 3...a6
 4.Ba4 Nf6 5.0-0 Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3 Nb8 10.d4 Nbd7
@@ -35,6 +37,19 @@ NOTATION_STR_TO_SYM = {
   "Q" => :queen,
   "K" => :king,
 }
+
+# Seven Tag Roster
+# Ordered set of required tags, with default values
+STR = [
+  ["Event", "?"],
+  ["Site", "?"],
+  ["Date", "????.??.??"],
+  ["Round", "?"],
+  ["White", "?"],
+  ["Black", "?"],
+  ["Result", "*"],
+]
+STR_SYMBOLS = %w[Event Site Date Round White Black Result]
 
 class PGNError < StandardError
 end
@@ -174,7 +189,7 @@ class ChessGame
     # Parse tag pairs
     while tokens.shift == "["
       symbol = tokens.shift
-      @tags[camel_to_snake(symbol).to_sym] = tokens.shift
+      @tags[symbol] = tokens.shift
 
       # There should only be 2 tokens inside the tag
       if tokens.shift != "]"
@@ -239,7 +254,7 @@ class ChessGame
     # Prettify draw result
     @result = "½-½" if @result == "1/2-1/2"
 
-    # If there's a result, need to set the sound for the last position
+    # If there's a result, need to set the sound for the last positionruby flap map
     @positions[-1][:sound] = :game_end if @result
 
     # We've been using @board to load the PGN, so set the position to
@@ -455,14 +470,49 @@ class ChessGame
     raise PGNError.new("Unable to make move: #{@move_count}#{dots} #{move[:san]}")
   end
 
-  # Convert CamelCase to snake_case
-  def camel_to_snake(str)
-    str.chars.map.with_index do |char, i|
-      if i > 0 && char.upcase == char && char.downcase != char
-        "_#{char.downcase}"
-      else
-        char.downcase
-      end
+  def export_pgn
+    # Seven Tag Roster is required in order even if the values aren't set
+    pgn = STR.map do |symbol, default|
+      "[#{symbol} #{pgn_string(@tags[symbol] || default)}]\n"
     end.join
+    # Then add any other tags
+    pgn << @tags.map do |symbol, value|
+      unless STR_SYMBOLS.include?(symbol)
+        "[#{symbol} #{pgn_string(value)}]\n"
+      else
+        nil
+      end
+    end.compact.join
+    pgn << "\n"
+
+    # Movetext
+    movetext = @positions[1..].map.with_index do |position, i|
+      color = position[:fen].split(" ")[1] == "b" ? :white : :black
+      move_num = color == :white ? "#{halfmove_to_move(i + 1)}." : ""
+      "#{move_num}#{@notation.flatten[i]}"
+    end.join(" ")
+
+    # Add result to movetext
+    movetext << " " + if @result
+      @result == "½-½" ? "1/2-1/2" : @result
+    else
+      "*"
+    end
+
+    pgn << soft_wrap(movetext)
+
+    pgn
+  end
+
+  def pgn_string(str)
+    "\"#{str.gsub('"', '\\"')}\""
+  end
+
+  # Word wraps a string at spaces
+  def soft_wrap(str, width = 80)
+    str.split.each_with_object([""]) do |word, lines|
+      lines[-1] += (lines[-1].empty? ? "" : " ") + word
+      lines << "" if lines[-1].length >= width
+    end.reject(&:empty?).join("\n")
   end
 end
