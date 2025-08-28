@@ -16,11 +16,11 @@ PGN = <<EOS
 1.e4 e5 2.Nf3 Nc6 3.Bb5 {This opening is called the "Ruy Lopez".} 3...a6
 4.Ba4 Nf6 5.0-0 Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3 Nb8 10.d4 Nbd7
 11.c4 c6 12.cxb5 axb5 13.Nc3 Bb7 14.Bg5 b4 ; Line comment "test"!!!
-15.Nb1 h6 16.Bh4 c5 17.dxe5 $242
+15.Nb1 h6 16.Bh4 c5 17.dxe5 $11
 Nxe4 18.Bxe7 Qxe7 19.exd6 Qf6 20.Nbd2 Nxd6 21.Nc4 Nxc4 22.Bxc4 Nb6
-23.Ne5 Rae8 24.Bxf7+ Rxf7 25.Nxf7 Rxe1+ 26.Qxe1 Kxf7 27.Qe3 Qg5 28.Qxg5
-hxg5 29.b3 Ke6 30.a3 Kd6 31.axb4 cxb4 32.Ra5 Nd5 33.f3 Bc8 34.Kf2 Bf5
-35.Ra7 g6 36.Ra6+ Kc5 37.Ke1 Nf4 38.g3 Nxh3 39.Kd2 Kb5 40.Rd6 Kc5 41.Ra6
+23.Ne5 Rae8 24.Bxf7+ Rxf7 25.Nxf7 Rxe1+!! 26.Qxe1 Kxf7 27.Qe3 Qg5 28.Qxg5
+hxg5 29.b3 Ke6 30.a3 Kd6? 31.axb4 cxb4 32.Ra5 Nd5 33.f3 Bc8 34.Kf2 Bf5
+35.Ra7 g6 36.Ra6+ Kc5 37.Ke1 Nf4?! 38.g3 Nxh3 39.Kd2 Kb5 40.Rd6 Kc5 41.Ra6
 Nf2 42.g4 Bd3 43.Re6 1/2-1/2
 EOS
 
@@ -28,7 +28,7 @@ ALPHA = (("A".."Z").to_a + ("a".."z").to_a).join("")
 NUMERIC = ("0".."9").to_a.join("")
 ALPHANUMERIC = ALPHA + NUMERIC
 WHITESPACE = " \n\t"
-SYMBOL = ALPHANUMERIC + "_+#=:-/"
+SYMBOL = ALPHANUMERIC + "_+#=:-/!?"
 
 NOTATION_STR_TO_SYM = {
   "N" => :knight,
@@ -50,6 +50,16 @@ STR = [
   ["Result", "*"],
 ]
 STR_SYMBOLS = %w[Event Site Date Round White Black Result]
+
+NAG_TRADITIONAL = {
+  1 => "!",
+  2 => "?",
+  3 => "!!",
+  4 => "??",
+  5 => "!?",
+  6 => "?!",
+}
+NAG_TRADITIONAL_SYMBOLS = NAG_TRADITIONAL.values
 
 class PGNError < StandardError
 end
@@ -216,12 +226,25 @@ class ChessGame
       elsif token == ";"
         @positions[-1][:annotation] = tokens.shift
       elsif token[0] == "$"
-        # TODO: Implement NAG, we're skipping these for now
+        @positions[-1][:nag] = token[1..].to_i
         next
       elsif token == "."
         next
       elsif ALPHA.include?(token[0]) || token[0..1] == "0-"
         # We've encountered a move
+
+        # Process traditional NAG annotation (!, ?, etc.)
+        nag = nil
+        symbol_size = nil
+        NAG_TRADITIONAL_SYMBOLS.each_with_index do |symbol, i|
+          if token.end_with?(symbol)
+            nag = i + 1
+            symbol_size = symbol.size
+          end
+        end
+        if symbol_size
+          token = token[0...-(symbol_size)]
+        end
 
         # Fix improper castling notation (it should be O not 0)
         if token == "0-0"
@@ -238,7 +261,7 @@ class ChessGame
           @notation << [token]
         end
 
-        add_move_to_positions(parse_move_notation(token))
+        add_move_to_positions(parse_move_notation(token, nag))
       else
         raise PGNError.new("PGN: Invalid token in movetext: #{token}")
       end
@@ -261,15 +284,15 @@ class ChessGame
     set_current_position(0)
   end
 
-  def parse_move_notation(str)
+  def parse_move_notation(str, nag)
     original_str = str
     color = @color_to_move
 
     # Castling is a special case, handle it right away
     if ["0-0", "O-O"].include?(str.upcase)
-      return { color: color, castle: :kingside }
+      return { san: "O-O", color: color, castle: :kingside, nag: nag }
     elsif ["0-0-0", "O-O-O"].include?(str.upcase)
-      return { color: color, castle: :queenside }
+      return { san: "O-O-O", color: color, castle: :queenside, nag: nag }
     end
 
     # Clone the input so we don't destroy it
@@ -335,6 +358,7 @@ class ChessGame
       promotion: promotion,
       check: check,
       checkmate: checkmate,
+      nag: nag,
     }
   end
 
@@ -352,6 +376,7 @@ class ChessGame
   #  * promotion
   #  * check
   #  * checkmate
+  #  * nag
   def add_move_to_positions(move)
     # Handle castling right away
     if (castle = move[:castle])
@@ -379,7 +404,7 @@ class ChessGame
       @halfmove_count += 1
       @halfmove_total += 1
 
-      @positions << position_entry(:castle)
+      @positions << position_entry(sound: :castle, nag: move[:nag])
 
       return
     end
@@ -459,7 +484,7 @@ class ChessGame
         end
         @halfmove_total += 1
 
-        @positions << position_entry(sound)
+        @positions << position_entry(sound: sound, nag: move[:nag])
 
         return
       end
@@ -488,9 +513,17 @@ class ChessGame
     movetext = @positions[1..].map.with_index do |position, i|
       color = position[:fen].split(" ")[1] == "b" ? :white : :black
       move_num = color == :white ? "#{halfmove_to_move(i + 1)}." : ""
+
+      nag = ""
+      if (1..6).include?(position[:nag])
+        nag = NAG_TRADITIONAL[position[:nag]]
+      elsif (position[:nag] || 0) > 6
+        nag = " $#{position[:nag]}"
+      end
+
       annotation = position[:annotation] ? " {#{position[:annotation]}}" : ""
 
-      "#{move_num}#{@notation.flatten[i]}#{annotation}"
+      "#{move_num}#{@notation.flatten[i]}#{nag}#{annotation}"
     end.join(" ")
 
     # Add result to movetext

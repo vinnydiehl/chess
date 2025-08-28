@@ -1,6 +1,6 @@
 class ChessGame
   # Entry into @positions
-  def position_entry(sound = nil)
+  def position_entry(sound: nil, nag: nil)
     {
       # FEN
       fen: get_fen,
@@ -14,6 +14,7 @@ class ChessGame
       last_move: @last_move_squares,
       captures: hash_deep_copy(@captures),
       annotation: nil,
+      nag: nag,
     }
   end
 
