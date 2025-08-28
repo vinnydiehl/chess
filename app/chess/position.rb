@@ -13,6 +13,7 @@ class ChessGame
       # Starting/finishing squares for the move before this one (for highlighting)
       last_move: @last_move_squares,
       captures: hash_deep_copy(@captures),
+      annotation: nil,
     }
   end
 

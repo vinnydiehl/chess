@@ -209,13 +209,12 @@ class ChessGame
           )
         end
       elsif token == "{"
-        # Ignore commentary
-        until tokens.shift == "}"
-          next
+        @positions[-1][:annotation] = tokens.shift
+        unless tokens.shift == "}"
+          raise PGNError.new("PGN: Annotation contains multiple tokens.")
         end
       elsif token == ";"
-        # If line commentary, ignore the next token (the commentary string)
-        tokens.shift
+        @positions[-1][:annotation] = tokens.shift
       elsif token[0] == "$"
         # TODO: Implement NAG, we're skipping these for now
         next
@@ -489,7 +488,9 @@ class ChessGame
     movetext = @positions[1..].map.with_index do |position, i|
       color = position[:fen].split(" ")[1] == "b" ? :white : :black
       move_num = color == :white ? "#{halfmove_to_move(i + 1)}." : ""
-      "#{move_num}#{@notation.flatten[i]}"
+      annotation = position[:annotation] ? " {#{position[:annotation]}}" : ""
+
+      "#{move_num}#{@notation.flatten[i]}#{annotation}"
     end.join(" ")
 
     # Add result to movetext
