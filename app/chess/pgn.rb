@@ -2,26 +2,49 @@
 # Specification: https://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 
 # Test PGN
-PGN = <<EOS
-[Event "F\\\\S Return Match"]
-[Site "Belgrade, \\"Serbia\\" JUG"]
-[Date "1992.11.04"]
-[Round "29"]
-%[White "Fischer, Robert J."]
-[Black "Spassky, Boris V."]
-[Result "1/2-1/2"]
-[WhiteElo "2400"]
-[BlackElo "2300"]
+# PGN = <<EOS
+# [Event "F\\\\S Return Match"]
+# [Site "Belgrade, \\"Serbia\\" JUG"]
+# [Date "1992.11.04"]
+# [Round "29"]
+# %[White "Fischer, Robert J."]
+# [Black "Spassky, Boris V."]
+# [Result "1/2-1/2"]
+# [WhiteElo "2400"]
+# [BlackElo "2300"]
+#
+# 1.e4 e5 2.Nf3 Nc6 3.Bb5 {This opening is called the "Ruy Lopez".} 3...a6
+# 4.Ba4 Nf6 5.0-0 Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3 Nb8 10.d4 Nbd7
+# 11.c4 c6 12.cxb5 axb5 13.Nc3 Bb7 14.Bg5 b4 ; Line comment "test"!!!
+# 15.Nb1 h6 16.Bh4 c5 17.dxe5 $11
+# Nxe4 18.Bxe7 Qxe7 19.exd6 Qf6 20.Nbd2 Nxd6 21.Nc4 Nxc4 22.Bxc4 Nb6
+# 23.Ne5 Rae8 24.Bxf7+ Rxf7 25.Nxf7 Rxe1+!! 26.Qxe1 Kxf7 27.Qe3 Qg5 28.Qxg5
+# hxg5 29.b3 Ke6 30.a3 Kd6? 31.axb4 cxb4 32.Ra5 Nd5 33.f3 Bc8 34.Kf2 Bf5
+# 35.Ra7 g6 36.Ra6+ Kc5 37.Ke1 Nf4?! 38.g3 Nxh3 39.Kd2 Kb5 40.Rd6 Kc5 41.Ra6
+# Nf2 42.g4 Bd3 43.Re6 1/2-1/2
+# EOS
 
-1.e4 e5 2.Nf3 Nc6 3.Bb5 {This opening is called the "Ruy Lopez".} 3...a6
-4.Ba4 Nf6 5.0-0 Be7 6.Re1 b5 7.Bb3 d6 8.c3 O-O 9.h3 Nb8 10.d4 Nbd7
-11.c4 c6 12.cxb5 axb5 13.Nc3 Bb7 14.Bg5 b4 ; Line comment "test"!!!
-15.Nb1 h6 16.Bh4 c5 17.dxe5 $11
-Nxe4 18.Bxe7 Qxe7 19.exd6 Qf6 20.Nbd2 Nxd6 21.Nc4 Nxc4 22.Bxc4 Nb6
-23.Ne5 Rae8 24.Bxf7+ Rxf7 25.Nxf7 Rxe1+!! 26.Qxe1 Kxf7 27.Qe3 Qg5 28.Qxg5
-hxg5 29.b3 Ke6 30.a3 Kd6? 31.axb4 cxb4 32.Ra5 Nd5 33.f3 Bc8 34.Kf2 Bf5
-35.Ra7 g6 36.Ra6+ Kc5 37.Ke1 Nf4?! 38.g3 Nxh3 39.Kd2 Kb5 40.Rd6 Kc5 41.Ra6
-Nf2 42.g4 Bd3 43.Re6 1/2-1/2
+PGN = <<EOS
+[Event "18th RSFSR-ch"]
+[Site "Sochi URS"]
+[Date "1958.06.??"]
+[EventDate "1958.06.00"]
+[Round "?"]
+[Result "0-1"]
+[White "Lev Polugaevsky"]
+[Black "Rashid Gibiatovich Nezhmetdinov"]
+[ECO "A53"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "66"]
+
+1. d4 Nf6 2. c4 d6 3. Nc3 e5 4. e4 exd4 5. Qxd4 Nc6 6. Qd2 g6
+7. b3 Bg7 8. Bb2 O-O 9. Bd3 Ng4 10. Nge2 Qh4 11. Ng3 Nge5
+12. O-O f5 13. f3 Bh6 14. Qd1 f4 15. Nge2 g5 16. Nd5 g4 17. g3
+fxg3 18. hxg3 Qh3 19. f4 Be6 20. Bc2 Rf7 21. Kf2 Qh2+ 22. Ke3
+Bxd5 23. cxd5 Nb4 24. Rh1 Rxf4 25. Rxh2 Rf3+ 26. Kd4 Bg7
+27. a4 c5+ 28. dxc6 bxc6 29. Bd3 Nexd3+ 30. Kc4 d5+ 31. exd5
+cxd5+ 32. Kb5 Rb8+ 33. Ka5 Nc6+ 0-1
 EOS
 
 ALPHA = (("A".."Z").to_a + ("a".."z").to_a).join("")
@@ -187,6 +210,8 @@ class ChessGame
         "PGN: End of tokenization reached with populated `current`: #{current}"
       )
     end
+
+    tokens << current unless current.empty?
 
     tokens
   end
