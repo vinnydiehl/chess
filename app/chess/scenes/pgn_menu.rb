@@ -37,14 +37,20 @@ class ChessGame
         PGN_MENU_BUTTON_WIDTH,
         PGN_MENU_BUTTON_HEIGHT,
         "Load", -> {
-          import_pgn(@multiline.value.to_s)
-          set_scene_back
+          @loading = true
         },
       ),
     ]
   end
 
   def pgn_menu_tick
+    if @loading
+      import_pgn(@multiline.value.to_s)
+      @loading = false
+      set_scene_back
+      return
+    end
+
     @multiline.tick
     @pgn_buttons.each(&:tick)
 
