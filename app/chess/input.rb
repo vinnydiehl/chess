@@ -54,7 +54,7 @@ class ChessGame
     end
 
     if @kb.key_down?(:p)
-      puts "\n#{export_pgn}"
+      set_scene(:pgn_menu)
     end
 
     if @kb.key_down?(:n)

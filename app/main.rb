@@ -1,4 +1,4 @@
-SCENES = %w[game fen_menu].freeze
+SCENES = %w[game fen_menu pgn_menu].freeze
 
 require "lib/input.rb"
 

@@ -37,7 +37,7 @@ class ChessGame
 
     @buttons = [
       Button.new(20, 20, 80, 40, "FEN", -> { set_scene(:fen_menu) }),
-      # Button.new(110, 20, 80, 40, "PGN", -> {  }),
+      Button.new(110, 20, 80, 40, "PGN", -> { set_scene(:pgn_menu) }),
     ]
   end
 
