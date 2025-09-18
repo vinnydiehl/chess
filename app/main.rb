@@ -1,6 +1,8 @@
-SCENES = %w[game].freeze
+SCENES = %w[game fen_menu].freeze
 
-%w[constants castling check chess color_view colors
+require "lib/input.rb"
+
+%w[constants button castling check chess color_view colors
    fen input mate material move notation pgn piece
    position vision].each { |f| require "app/chess/#{f}.rb" }
 

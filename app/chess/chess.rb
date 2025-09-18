@@ -7,6 +7,8 @@ class ChessGame
 
     @screen_width = args.grid.w
     @screen_height = args.grid.h
+    @cx = @screen_width / 2
+    @cy = @screen_height / 2
 
     @inputs = args.inputs
     @mouse = args.inputs.mouse
@@ -20,8 +22,22 @@ class ChessGame
     @sprites = args.outputs.sprites
 
     @scene_stack = []
-    @scene = :game
-    game_init
+    set_scene(:game, reset_stack: true)
+  end
+
+  def set_scene(scene, reset_stack: false)
+    @scene_stack = [] if reset_stack
+    @scene = scene
+    @scene_stack << scene
+
+    ["#{scene}_init", "render_#{scene}_init"].each do |method|
+      send method if respond_to?(method)
+    end
+  end
+
+  def set_scene_back
+    @scene_stack.pop
+    @scene = @scene_stack.last
   end
 
   def tick
@@ -32,8 +48,8 @@ class ChessGame
     send "render_#{scene}"
 
     # Reset game, for development
-    if @inputs.keyboard.key_down.backspace
-      @args.gtk.reset
+    if @kb.key_down_or_held?(:shift) && @kb.key_down?(:backspace)
+      @args.gtk.reboot
     end
   end
 

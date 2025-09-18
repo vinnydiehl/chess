@@ -50,7 +50,7 @@ class ChessGame
   # Noticing a trend here?
   def process_keyboard_inputs
     if @kb.key_down?(:f)
-      puts get_fen
+      set_scene(:fen_menu)
     end
 
     if @kb.key_down?(:p)

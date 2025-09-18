@@ -35,8 +35,10 @@ class ChessGame
     @board = Array.new(8) { Array.new(8, nil) }
     reset_game(FEN)
 
-    # PGN testing
-    import_pgn(PGN)
+    @buttons = [
+      Button.new(20, 20, 80, 40, "FEN", -> { set_scene(:fen_menu) }),
+      # Button.new(110, 20, 80, 40, "PGN", -> {  }),
+    ]
   end
 
   def reset_game(fen = START_POS_FEN)
@@ -86,6 +88,7 @@ class ChessGame
   end
 
   def game_tick
+    @buttons.each(&:tick)
     resolve_move_input
     process_mouse_inputs
     process_keyboard_inputs

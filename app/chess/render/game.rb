@@ -4,12 +4,17 @@ class ChessGame
     @board_view = @color_view == :white ? @board : rotate_180(@board)
 
     render_background
+    render_buttons
     render_board
     render_square_highlights
     render_pieces
     render_captures_and_material
     render_notation
     render_promotion_picker if @promotion
+  end
+
+  def render_buttons
+    @primitives << @buttons
   end
 
   def render_board
