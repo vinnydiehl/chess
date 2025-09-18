@@ -8,6 +8,9 @@ TEXT_COLOR = {
 ANNOTATED_COLOR = {
   r: 0, g: 183, b: 235
 }
+EDITING_COLOR = {
+  r: 128, g: 239, b: 128
+}
 
 DARK_SQUARE_COLOR = {
   r: 118, g: 150, b: 86

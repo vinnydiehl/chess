@@ -42,6 +42,12 @@ class ChessGame
       if @mouse.key_down.left && (halfmove = mouse_pos_to_halfmove)
         set_current_position(halfmove)
       end
+
+      if @mouse.key_down.right && (halfmove = mouse_pos_to_halfmove)
+        set_current_position(halfmove)
+        @position_editing = @positions[halfmove]
+        init_position_editor
+      end
     end
   end
 
@@ -49,20 +55,30 @@ class ChessGame
   # Maybe needs a refactor...
   # Noticing a trend here?
   def process_keyboard_inputs
-    if @kb.key_down?(:f)
-      set_scene(:fen_menu)
-    end
+    if @position_editing
+      if @kb.key_down?(:enter)
+        save_position
+      end
 
-    if @kb.key_down?(:p)
-      set_scene(:pgn_menu)
-    end
+      if @kb.key_down?(:escape)
+        @position_editing = nil
+      end
+    else
+      if @kb.key_down?(:f)
+        set_scene(:fen_menu)
+      end
 
-    if @kb.key_down?(:n)
-      print_notation
-    end
+      if @kb.key_down?(:p)
+        set_scene(:pgn_menu)
+      end
 
-    if @kb.key_down?(:space)
-      @color_view = OTHER_COLOR[@color_view]
+      if @kb.key_down?(:n)
+        print_notation
+      end
+
+      if @kb.key_down?(:space)
+        @color_view = OTHER_COLOR[@color_view]
+      end
     end
 
     if @kb.key_down?(:right)

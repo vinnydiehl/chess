@@ -4,7 +4,13 @@ class ChessGame
     @board_view = @color_view == :white ? @board : rotate_180(@board)
 
     render_background
-    render_buttons
+
+    if @position_editing
+      render_position_editor
+    else
+      render_buttons
+    end
+
     render_board
     render_square_highlights
     render_pieces
@@ -15,6 +21,13 @@ class ChessGame
 
   def render_buttons
     @primitives << @buttons
+  end
+
+  def render_position_editor
+    @primitives << [
+      @editor_multiline,
+      @editing_buttons,
+    ]
   end
 
   def render_board
@@ -130,6 +143,8 @@ class ChessGame
 
   # Debug function to show what pieces each side has vision on
   def render_vision_highlights
+    return if @position_editing
+
     { w: :white, b: :black }.each do |key, color|
       if @kb.key_down_or_held?(key)
         vision = color_vision(color)
@@ -307,7 +322,14 @@ class ChessGame
           alignment_enum: 0,
           vertical_alignment_enum: 0,
           size_enum: NOTATION_SIZE,
-          **(@positions[position][:annotation] ? ANNOTATED_COLOR : TEXT_COLOR),
+          # Color
+          **(if @positions[position] === @position_editing
+            EDITING_COLOR
+          elsif @positions[position][:annotation]
+            ANNOTATED_COLOR
+          else
+            TEXT_COLOR
+          end),
         }
       end
     end
