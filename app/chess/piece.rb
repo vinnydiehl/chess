@@ -36,6 +36,12 @@ class ChessGame
       temp_board = board_deep_copy(board)
       temp_board[sx][sy] = nil
       temp_board[x][y] = piece
+
+      # Simulate en passant capture
+      if piece.type == :pawn && [x, y] == @en_passant_target
+        temp_board[x][sy] = nil
+      end
+
       in_check?(piece.color, temp_board)
     end
 

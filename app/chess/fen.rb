@@ -6,6 +6,8 @@ FEN = START_POS_FEN
 # Test repeat moves w/ en passant
 # FEN = "6k1/8/8/8/6p1/8/5P2/6K1 w - - 0 1"
 # FEN = "6k1/8/8/8/6p1/8/5PR1/6K1 w - - 0 1"
+# En passant while in check
+# FEN = "r5k1/pp4bp/3p4/2pPn3/Pn1KP1p1/1P3rP1/1BB1N2R/R2Q4 w - c6 0 28"
 
 # FEN = "K/8/8/8/8/8/8/kq w KQkq - 0 1"
 # FEN = "8/1Q2K3/p2B1n2/1k4Pp/8/1R3P2/3bP3/1N5q w - h6 0 1"
