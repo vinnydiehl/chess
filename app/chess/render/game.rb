@@ -295,6 +295,8 @@ class ChessGame
       }
 
       line.each_with_index do |move, move_i|
+        position = ((turn_i + @notation_box_position) * 2) + 1 + move_i
+
         # Draw move notation
         @primitives << {
           primitive_marker: :label,
@@ -305,7 +307,7 @@ class ChessGame
           alignment_enum: 0,
           vertical_alignment_enum: 0,
           size_enum: NOTATION_SIZE,
-          **TEXT_COLOR,
+          **(@positions[position][:annotation] ? ANNOTATED_COLOR : TEXT_COLOR),
         }
       end
     end

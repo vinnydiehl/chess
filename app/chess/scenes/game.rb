@@ -84,6 +84,8 @@ class ChessGame
     # Which position are we displaying?
     @current_position = 0
 
+    @notation_box_position = 0
+
     play_sound(:game_start)
   end
 
