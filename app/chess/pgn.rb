@@ -99,13 +99,13 @@ class ChessGame
           # End the token at the terminating }
           if c == "}"
             build = nil
-            tokens << current.strip
+            tokens << current.strip.gsub("\n", " ")
             current = ""
             # The } is a token
             tokens << c
           else
             # Newline becomes a space
-            current << c == "\n" ? " " : c
+            current << c
           end
 
           next
