@@ -199,7 +199,8 @@ class ChessGame
     tokens = tokenize_pgn(str)
 
     # Parse tag pairs
-    while tokens.shift == "["
+    while tokens[0] == "["
+      tokens.shift
       symbol = tokens.shift
       @tags[symbol] = tokens.shift
 
