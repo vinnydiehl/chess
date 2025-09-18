@@ -38,7 +38,10 @@ class ChessGame
       @x_orig, @y_orig = mouse_board_pos
       piece = @board[@x_orig][@y_orig]
 
-      return unless piece
+      if !piece
+        @x_orig, @y_orig = previous_selection
+        return
+      end
 
       # If switching selections, this needs to be reset
       if [@x_orig, @y_orig] != previous_selection
@@ -48,6 +51,7 @@ class ChessGame
       # Don't even let the piece be picked up if it's not
       # that color's turn
       if piece.color != @color_to_move
+        @x_orig, @y_orig = previous_selection
         play_sound(:illegal)
         return
       end
