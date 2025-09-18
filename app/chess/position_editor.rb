@@ -22,7 +22,7 @@ class ChessGame
     @editing_buttons = [
       Button.new(
         20, 20, 80, 40,
-        "Back", -> { @position_editing = nil },
+        "Back", method(:close_editor),
       ),
       Button.new(
         110, 20, 80, 40,
@@ -34,6 +34,18 @@ class ChessGame
   def save_position
     annotation = @editor_multiline.value.to_s.strip.gsub("\n", " ")
     @position_editing[:annotation] = annotation.empty? ? nil : annotation
+    close_editor
+  end
+
+  def open_editor(halfmove)
+    return if @position_editing == @positions[halfmove]
+
+    set_current_position(halfmove)
+    @position_editing = @positions[halfmove]
+    init_position_editor
+  end
+
+  def close_editor
     @position_editing = nil
   end
 end

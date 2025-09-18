@@ -19,6 +19,7 @@ class ChessGame
   end
 
   def set_current_position(n)
+    return if @current_position == n
     return unless (0...@positions.size).include?(n)
 
     # Clear piece selection

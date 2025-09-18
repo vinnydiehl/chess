@@ -44,9 +44,7 @@ class ChessGame
       end
 
       if @mouse.key_down.right && (halfmove = mouse_pos_to_halfmove)
-        set_current_position(halfmove)
-        @position_editing = @positions[halfmove]
-        init_position_editor
+        open_editor(halfmove)
       end
     end
   end
@@ -61,9 +59,13 @@ class ChessGame
       end
 
       if @kb.key_down?(:escape)
-        @position_editing = nil
+        close_editor
       end
     else
+      if @kb.key_down?(:enter)
+        open_editor(@current_position)
+      end
+
       if @kb.key_down?(:f)
         set_scene(:fen_menu)
       end
