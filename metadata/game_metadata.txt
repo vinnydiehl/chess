@@ -2,5 +2,5 @@ devid=vinnydiehl
 devtitle=Vinny Diehl
 gameid=chess
 gametitle=Chess
-version=1.0.1
+version=1.1
 icon=metadata/icon.png
