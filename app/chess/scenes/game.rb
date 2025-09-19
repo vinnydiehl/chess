@@ -36,9 +36,9 @@ class ChessGame
     reset_game(FEN)
 
     @buttons = [
-      Button.new(20, 20, 80, 40, "FEN", -> { set_scene(:fen_menu) }),
-      Button.new(110, 20, 80, 40, "PGN", -> { set_scene(:pgn_menu) }),
-      Button.new(20, 70, 170, 40, "Edit Board", -> { @editing_board = true }),
+      Button.new(20, 20, 170, 40, "Edit Board", -> { @editing_board = true }),
+      Button.new(20, 70, 80, 40, "FEN", -> { set_scene(:fen_menu) }),
+      Button.new(110, 70, 80, 40, "PGN", -> { set_scene(:pgn_menu) }),
     ]
     @editing_board_buttons = [
       Button.new(20, 20, 170, 40, "Close", -> do
