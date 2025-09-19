@@ -197,6 +197,14 @@ class ChessGame
         @promotion = [x, y]
       end
     else
+      # Let any piece capture "en passant"
+      # Keeping this logic separate so it can be made into a setting
+      if [x, y] == @en_passant_target
+        ep_y = piece.color == :white ? y - 1 : y + 1
+        capture = @board[x][ep_y]
+        @board[x][ep_y] = nil
+      end
+
       @en_passant_target = nil
     end
 
