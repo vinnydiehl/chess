@@ -44,7 +44,11 @@ class ChessGame
       end
 
       if @mouse.key_down.right && (halfmove = mouse_pos_to_halfmove)
-        open_editor(halfmove)
+        if @positions[halfmove] == @position_editing
+          close_editor
+        else
+          open_editor(halfmove)
+        end
       end
     end
   end
