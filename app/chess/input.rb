@@ -39,6 +39,8 @@ class ChessGame
         end
       end
 
+      return if @promotion
+
       if @mouse.key_down.left && (halfmove = mouse_pos_to_halfmove)
         set_current_position(halfmove)
       end
