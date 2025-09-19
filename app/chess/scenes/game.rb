@@ -39,25 +39,6 @@ class ChessGame
       Button.new(20, 20, 80, 40, "FEN", -> { set_scene(:fen_menu) }),
       Button.new(110, 20, 80, 40, "PGN", -> { set_scene(:pgn_menu) }),
     ]
-
-    @editor_multiline = Input::Multiline.new(
-      x: 20,
-      y: 100,
-      w: 190,
-      h: 640,
-      value: "test",
-      # value: @position_editing[:annotation] || "",
-      prompt: "Add annotation...",
-      size_enum: :xlarge,
-      background_color: [80] * 3,
-      blurred_background_color: [80] * 3,
-      cursor_color: [255] * 3,
-      text_color: [230] * 3,
-      selection_color: [30] * 3,
-      on_clicked: lambda do |_, input|
-        input.focus
-      end,
-    )
   end
 
   def reset_game(fen = START_POS_FEN)
