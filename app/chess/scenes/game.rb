@@ -38,6 +38,16 @@ class ChessGame
     @buttons = [
       Button.new(20, 20, 80, 40, "FEN", -> { set_scene(:fen_menu) }),
       Button.new(110, 20, 80, 40, "PGN", -> { set_scene(:pgn_menu) }),
+      Button.new(20, 70, 170, 40, "Edit Board", -> { @editing_board = true }),
+    ]
+    @editing_board_buttons = [
+      Button.new(20, 20, 170, 40, "Close", -> do
+        @editing_board = false
+        @piece_selected = nil
+      end),
+      Button.new(20, 70, 170, 40, "Clear", -> do
+        @board = Array.new(8) { Array.new(8, nil) }
+      end),
     ]
   end
 
@@ -97,7 +107,9 @@ class ChessGame
     if @position_editing
       @editor_multiline.tick
       @editing_buttons.each(&:tick)
-    else
+    elsif @editing_board
+      @editing_board_buttons.each(&:tick)
+    elsif !@promotion
       @buttons.each(&:tick)
     end
   end

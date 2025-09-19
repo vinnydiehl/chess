@@ -5,7 +5,10 @@ OTHER_COLOR = {
   black: :white
 }
 
+# From left to right
 PROMOTION_PIECES = %i[queen rook bishop knight]
+# From bottom to top
+BOARD_EDITOR_PIECES = %i[pawn knight bishop rook queen king]
 
 # Define material values
 PIECE_VALUE = {

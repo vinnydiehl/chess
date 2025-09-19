@@ -35,7 +35,7 @@ class ChessGame
       x, y = mouse_board_pos
 
       # Move a selected piece if one of the legal squares is clicked on
-      if @piece_selected &&
+      if @piece_selected && !@editing_board &&
          legal_moves(@piece_selected, @x_orig, @y_orig).include?([x, y])
         move_piece(@piece_selected, x, y)
         return
@@ -59,7 +59,7 @@ class ChessGame
 
       # Don't even let the piece be picked up if it's not
       # that color's turn
-      if piece.color != @color_to_move
+      if piece.color != @color_to_move && !@editing_board
         @x_orig, @y_orig = previous_selection
         play_sound(:illegal)
         return
@@ -71,9 +71,20 @@ class ChessGame
       @board[@x_orig][@y_orig] = nil
     end
 
+    if (piece = board_editor_mouse_piece) && @mouse.key_down.left
+      @piece_held = piece
+    end
+
     if @piece_held && @mouse.key_up.left
       if mouse_on_board?
         x, y = mouse_board_pos
+
+        if @editing_board
+          @board[x][y] = @piece_held
+          @piece_held = nil
+          play_sound(:move_self)
+          return
+        end
 
         # Reject move if releasing in the sqaure of origin,
         # or the move is illegal
@@ -100,6 +111,11 @@ class ChessGame
 
         move_piece(@piece_held, x, y)
       else
+        if @editing_board
+          @piece_held = nil
+          return
+        end
+
         # Tried to drag a piece off the board, put it back
         @board[@piece_original_pos.x][@piece_original_pos.y] = @piece_held
         @piece_held = nil

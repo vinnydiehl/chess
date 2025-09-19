@@ -1,4 +1,14 @@
 class ChessGame
+  def render_game_init
+    @board_editor_rect = {
+      x: @x_offset / 2 - @square_size,
+      # 55 is half the height of the buttons
+      y: @cy + 55 - ((@square_size * BOARD_EDITOR_PIECES.size) / 2),
+      w: @square_size * 2,
+      h: @square_size * BOARD_EDITOR_PIECES.size,
+    }
+  end
+
   def render_game
     # If we're viewing as black, flip the board
     @board_view = @color_view == :white ? @board : rotate_180(@board)
@@ -7,6 +17,8 @@ class ChessGame
 
     if @position_editing
       render_position_editor
+    elsif @editing_board
+      render_board_editor
     else
       render_buttons
     end
@@ -28,6 +40,22 @@ class ChessGame
       @editor_multiline,
       @editing_buttons,
     ]
+  end
+
+  def render_board_editor
+    @primitives << @editing_board_buttons
+
+    [:white, :black].each_with_index do |color, ci|
+      BOARD_EDITOR_PIECES.each_with_index do |type, ti|
+        piece = Piece.new(color, type)
+
+        render_piece(
+          piece,
+          @board_editor_rect.x + (@square_size * ci),
+          @board_editor_rect.y + (@square_size * ti),
+        )
+      end
+    end
   end
 
   def render_board
@@ -62,11 +90,15 @@ class ChessGame
   end
 
   def render_square_highlights
-    render_last_move_highlight if @last_move_squares
+    if @last_move_squares && !@editing_board
+      render_last_move_highlight
+    end
 
     unless @promotion || @result
       render_hover_highlight
-      render_legal_highlights if @piece_selected
+      if @piece_selected && !@editing_board
+        render_legal_highlights
+      end
       render_vision_highlights
     end
   end
@@ -85,8 +117,9 @@ class ChessGame
   def render_hover_highlight
     # Highlight square under cursor, unless a piece is picked up, then leave
     # the highlight on the piece's original position
-    if mouse_on_board? || @piece_held
-      x, y = true_square(@piece_held ? @piece_original_pos : mouse_board_pos)
+    making_move = @piece_held && !@editing_board
+    if mouse_on_board? || making_move
+      x, y = true_square(making_move ? @piece_original_pos : mouse_board_pos)
 
       @primitives << {
         primitive_marker: :solid,
