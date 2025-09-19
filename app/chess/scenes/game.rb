@@ -45,8 +45,13 @@ class ChessGame
         @editing_board = false
         @piece_selected = nil
       end),
-      Button.new(20, 70, 170, 40, "Clear", -> do
+      Button.new(20, 70, 80, 40, "Clear", -> do
         @board = Array.new(8) { Array.new(8, nil) }
+      end),
+      Button.new(110, 70, 80, 40, "Reset", -> do
+        reset_game
+        load_fen(START_POS_FEN)
+        play_sound(:game_start)
       end),
     ]
   end
