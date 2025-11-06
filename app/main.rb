@@ -1,6 +1,6 @@
 SCENES = %w[game fen_menu pgn_menu].freeze
 
-require "lib/input.rb"
+%w[input stockfish].each { |f| require "lib/#{f}.rb" }
 
 %w[constants board_editor button castling check chess color_view
    colors fen input mate material move notation pgn piece

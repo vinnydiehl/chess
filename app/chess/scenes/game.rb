@@ -6,6 +6,9 @@ class ChessGame
     @legal_marker_size = @square_size / 4
     @color_view = :white
 
+    @stockfish = Stockfish.new
+    @stockfish.set_option("MultiPV", 5)
+
     ### Values for input and rendering
     # Left side of the board
     @x_offset = @screen_width / 6
@@ -87,6 +90,9 @@ class ChessGame
     #   @move_count
     load_fen(fen)
 
+    @stockfish.set_fen(fen)
+    @stockfish.go
+
     # @halfmove_count resets during a pawn push or capture, but
     # this keeps a running total for keeping track of where in
     # @positions we are.
@@ -105,6 +111,13 @@ class ChessGame
   end
 
   def game_tick
+    @stockfish.tick
+    # DEBUG: Print the best lines to the console.
+    puts "=" * 20
+    @stockfish.variations.each do |n, pv|
+      puts "[#{n}] #{pv}"
+    end
+
     resolve_move_input
     process_mouse_inputs
     process_keyboard_inputs

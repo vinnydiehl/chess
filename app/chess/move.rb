@@ -258,6 +258,10 @@ class ChessGame
 
     auto_scroll_notation
 
+    @stockfish.stop
+    @stockfish.set_fen(get_fen)
+    @stockfish.go
+
     sound ||= :move_self
 
     # Set sound if we're creating a new position
